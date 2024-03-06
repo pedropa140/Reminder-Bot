@@ -29,31 +29,41 @@ async def adduser(message : discord.message.Message, client : discord.Client, us
         def check(m):
             return m.author == message.author and m.channel == message.channel
         prefered_time = await client.wait_for('message', check=check, timeout=30)
-        def validate_time(time_str):
-            hours, minutes = time_str.split(':')
-            if not hours.isdigit() or not minutes.isdigit():
-                return False
-            hours = int(hours)
-            minutes = int(minutes)
-            if hours < 0 or hours > 24 or minutes < 0 or minutes > 60:
-                return False
-            return True
-        prefered_time_content = prefered_time.content
-        check = validate_time(prefered_time_content)
-        if check:
-            userDatabase.add_user(User(message.author.name, str(message.author.id), prefered_time_content))
-            result_title = f'**User Created**'
-            result_description = f'User created for **{message.author.mention}**'
-            embed = discord.Embed(title=result_title, description=result_description, color=0xFF5733)
-            file = discord.File('images/icon.png', filename='icon.png')
-            embed.set_thumbnail(url='attachment://icon.png')
-            embed.set_author(name="Reminder-Bot says:")
-            embed.set_footer(text="!adduser")
-            await message.channel.send(file=file, embed=embed)
-        else:
-            result_title = f'Invalid Output'
-            result_description = f'Did not create user for **{message.author.mention}**'
-            embed = discord.Embed(title=result_title, description=result_description, color=0xFF5733)
+        try:
+            def validate_time(time_str):
+                hours, minutes = time_str.split(':')
+                if not hours.isdigit() or not minutes.isdigit():
+                    return False
+                hours = int(hours)
+                minutes = int(minutes)
+                if hours < 0 or hours > 24 or minutes < 0 or minutes > 60:
+                    return False
+                return True
+            prefered_time_content = prefered_time.content
+            check = validate_time(prefered_time_content)
+            if check:
+                userDatabase.add_user(User(message.author.name, str(message.author.id), prefered_time_content))
+                result_title = f'**User Created**'
+                result_description = f'User created for **{message.author.mention}**'
+                embed = discord.Embed(title=result_title, description=result_description, color=0xFF5733)
+                file = discord.File('images/icon.png', filename='icon.png')
+                embed.set_thumbnail(url='attachment://icon.png')
+                embed.set_author(name="Reminder-Bot says:")
+                embed.set_footer(text="!adduser")
+                await message.channel.send(file=file, embed=embed)
+            else:
+                result_title = f'Invalid Output'
+                result_description = f'Did not create user for **{message.author.mention}**'
+                embed = discord.Embed(title=result_title, description=result_description, color=0xFF5733)
+                file = discord.File('images/icon.png', filename='icon.png')
+                embed.set_thumbnail(url='attachment://icon.png')
+                embed.set_author(name="Reminder-Bot says:")
+                embed.set_footer(text="!adduser")
+                await message.channel.send(file=file, embed=embed)
+        except asyncio.TimeoutError:
+            # await message.channel.send(f'{message.author.mention} has taken too long to respond.')
+            string = f'{message.author.mention} has taken too long to respond.'
+            embed = discord.Embed(title= "Timeout Error", description=string, color=0xFF5733)
             file = discord.File('images/icon.png', filename='icon.png')
             embed.set_thumbnail(url='attachment://icon.png')
             embed.set_author(name="Reminder-Bot says:")
@@ -137,7 +147,7 @@ async def changereminder(message : discord.message.Message, client : discord.Cli
         except asyncio.TimeoutError:
             # await message.channel.send(f'{message.author.mention} has taken too long to respond.')
             string = f'{message.author.mention} has taken too long to respond.'
-            embed = discord.Embed(description=string, color=0xFF5733)
+            embed = discord.Embed(title= "Timeout Error", description=string, color=0xFF5733)
             file = discord.File('images/icon.png', filename='icon.png')
             embed.set_thumbnail(url='attachment://icon.png')
             embed.set_author(name="Reminder-Bot says:")
@@ -200,7 +210,7 @@ async def deleteuser(message : discord.message.Message, client : discord.Client,
         except asyncio.TimeoutError:
             # await message.channel.send(f'{message.author.mention} has taken too long to respond.')
             string = f'{message.author.mention} has taken too long to respond.'
-            embed = discord.Embed(description=string, color=0xFF5733)
+            embed = discord.Embed(title= "Timeout Error", description=string, color=0xFF5733)
             file = discord.File('images/icon.png', filename='icon.png')
             embed.set_thumbnail(url='attachment://icon.png')
             embed.set_author(name="Reminder-Bot says:")

@@ -1,5 +1,4 @@
 import sqlite3
-from datetime import datetime
 
 class User:
     def __init__(self, discord_name, discord_id, time_preference):
@@ -12,9 +11,10 @@ class UserDatabase:
         self.conn = sqlite3.connect(db_name)
         self.cursor = self.conn.cursor()
         self.cursor.execute('''CREATE TABLE IF NOT EXISTS users
-                               (discord_name TEXT, discord_id TEXT PRIMARY KEY, time_preference TEXT)''')
+                            (discord_name TEXT, discord_id TEXT PRIMARY KEY, time_preference TEXT)''')
         self.cursor.execute('''CREATE TABLE IF NOT EXISTS user_tasks
-                               (discord_id TEXT, task_name TEXT, task_time TEXT, task_date TEXT, completed BOOLEAN)''')
+                            (discord_id TEXT, task_name TEXT PRIMARY KEY, start_time TEXT, end_time TEXT, completed BOOLEAN)''')
+
         self.conn.commit()
 
     def add_user(self, user):
@@ -38,22 +38,26 @@ class UserDatabase:
         count = self.cursor.fetchone()[0]
         return count > 0
 
-    def add_task(self, discord_id, task_name, task_time, task_date, completed=False):
-        self.cursor.execute("INSERT INTO user_tasks VALUES (?, ?, ?, ?, ?)", (discord_id, task_name, task_time, task_date, completed))
+    def add_task(self, discord_id, task_name, start_time, end_time, completed=False):
+        self.cursor.execute("INSERT INTO user_tasks VALUES (?, ?, ?, ?, ?)", (discord_id, task_name, start_time, end_time, completed))
         self.conn.commit()
+
+    def get_task_by_name(self, task_name):
+        self.cursor.execute("SELECT * FROM user_tasks WHERE task_name=?", (task_name,))
+        return self.cursor.fetchone()
 
     def get_tasks_by_id(self, discord_id):
         self.cursor.execute("SELECT * FROM user_tasks WHERE discord_id=?", (discord_id,))
         return self.cursor.fetchall()
 
-    def update_task_completion(self, discord_id, task_name, task_time, task_date, completed):
-        self.cursor.execute("UPDATE user_tasks SET completed=? WHERE discord_id=? AND task_name=? AND task_time=? AND task_date=?", 
-                            (completed, discord_id, task_name, task_time, task_date))
+    def update_task_completion(self, discord_id, task_name, completed):
+        self.cursor.execute("UPDATE user_tasks SET completed=? WHERE discord_id=? AND task_name=?", 
+                            (completed, discord_id, task_name))
         self.conn.commit()
 
-    def delete_task(self, discord_id, task_name, task_time, task_date):
-        self.cursor.execute("DELETE FROM user_tasks WHERE discord_id=? AND task_name=? AND task_time=? AND task_date=?", 
-                            (discord_id, task_name, task_time, task_date))
+    def delete_task(self, discord_id, task_name):
+        self.cursor.execute("DELETE FROM user_tasks WHERE discord_id=? AND task_name=?", 
+                            (discord_id, task_name))
         self.conn.commit()
 
     def close(self):

@@ -40,3 +40,20 @@ async def time(message : discord.message.Message):
     embed.set_author(name="Reminder-Bot says:")
     embed.set_footer(text="!time")
     await message.channel.send(file=file, embed=embed)
+
+async def pomodoro(message : discord.message.Message):
+    return NotImplementedError()
+
+async def help(message : discord.message.Message):
+    # result_string = f'!Help'
+    # help_description = f''''''
+    # embed = discord.Embed(title=result_string, description=help_description, color=0xFF5733)
+    # file = discord.File('images/icon.png', filename='icon.png')
+    # embed.set_thumbnail(url='attachment://icon.png')
+    # embed.set_author(name="Reminder-Bot says:")
+    # embed.set_footer(text="!help")
+    # await message.channel.send(file=file, embed=embed)
+    return NotImplementedError()
+
+async def invalidInput(message : discord.message.Message):
+    return NotImplementedError()

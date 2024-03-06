@@ -8,6 +8,7 @@ import datetime
 
 import regular_response
 import user_response
+import task_response
 from user import User, UserDatabase
 
 load_dotenv()
@@ -68,19 +69,21 @@ def run_discord_bot():
         elif message.content == '!deleteuser':
             await user_response.deleteuser(message, client, userDatabase)
         elif message.content == '!addtask':
-            return NotImplementedError()
-        elif message.content == '!gettask':
-            return NotImplementedError()
-        elif message.content == 'removetask':
-            return NotImplementedError()
+            await task_response.addtask(message, client, userDatabase)
+        elif message.content == '!todaytask':
+            await task_response.todaytask(message, client, userDatabase)
+        elif message.content == '!alltasks':
+            await task_response.alltask(message, client, userDatabase)
+        elif message.content == '!removetask':
+            await task_response.removetask(message, client, userDatabase)
         elif message.content == '!completetask':
-            return NotImplementedError()
+            await task_response.completetask(message, client, userDatabase)
         elif message.content == '!pomodoro':
-            return NotImplementedError()
+            await regular_response.pomodoro(message)
         elif message.content == '!help':
-            return NotImplementedError()
+            await regular_response.help(message)
         else:
-            return NotImplementedError()
+            await regular_response.invalidInput(message)
         userDatabase.close()
         print("Database Closed")
 
