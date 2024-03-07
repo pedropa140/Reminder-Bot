@@ -55,7 +55,6 @@ def run_discord_bot():
 
     async def process_command(message : discord.message.Message, client : discord.Client):
         userDatabase = UserDatabase('user_database.db')
-        print("Database Connected")
         if message.content == '!hello':
             await regular_response.hello(message)
         elif message.content == '!time':
@@ -79,13 +78,12 @@ def run_discord_bot():
         elif message.content == '!completetask':
             await task_response.completetask(message, client, userDatabase)
         elif message.content == '!pomodoro':
-            await regular_response.pomodoro(message)
+            await regular_response.pomodoro(message, client)
         elif message.content == '!help':
-            await regular_response.help(message)
+            await regular_response.help(message, client)
         else:
-            await regular_response.invalidInput(message)
+            await regular_response.invalidInput(message, client)
         userDatabase.close()
-        print("Database Closed")
 
     client.run(TOKEN)
     
