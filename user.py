@@ -21,6 +21,10 @@ class UserDatabase:
         self.cursor.execute("INSERT INTO users VALUES (?, ?, ?)", (user.discord_name, user.discord_id, user.time_preference))
         self.conn.commit()
 
+    def get_all_users(self):
+        self.cursor.execute("SELECT discord_name, discord_id, time_preference FROM users")
+        return self.cursor.fetchall()
+
     def get_user_by_id(self, discord_id):
         self.cursor.execute("SELECT * FROM users WHERE discord_id=?", (discord_id,))
         return self.cursor.fetchone()

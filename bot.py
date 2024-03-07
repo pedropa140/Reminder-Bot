@@ -18,11 +18,12 @@ def run_discord_bot():
     intents = discord.Intents.default()
     intents.message_content = True
     client = discord.Client(intents=intents)
+    userDatabase = UserDatabase('user_database.db')
     
     @client.event
     async def on_ready():
         print(f'{client.user} is now running!')
-        # client.loop.create_task(ping_at_specific_time(client))
+        client.loop.create_task(ping_at_specific_time(client))
     
     @client.event
     async def on_message(message : discord.message.Message):
@@ -43,18 +44,41 @@ def run_discord_bot():
             if message.content.startswith('!'):
                 await process_command(message, client)
     
-    # async def ping_at_specific_time(client):
-    #     while True:
-    #         current_time = datetime.datetime.now().strftime("%H:%M")
-    #         if current_time == "08:00":
-    #             print(f'{current_time} BOT PINGED')
-    #             user = await client.fetch_user('525874420703559702')
-    #             await user.send("It's time to do something!")
-
-    #         await asyncio.sleep(5)
+    async def ping_at_specific_time(client : discord.Client):
+        user_list = userDatabase.get_all_users()
+        while True:
+            current_time = datetime.datetime.now().strftime("%H:%M")
+            for user in user_list:
+                if current_time == user[2]:
+                    print(f'{current_time} BOT PINGED')
+                    user = await client.fetch_user(user[2])
+                    tasks_list = userDatabase.get_tasks_by_id(user[2])
+                    def convert_to_datetime(date_str):
+                        try:
+                            return datetime.datetime.strptime(date_str, "%Y%m%dT%H:%M:%S")
+                        except ValueError:
+                            print(f"Error: Invalid date string encountered: {date_str}")
+                            return None
+                    today_date = datetime.datetime.today().date()
+                    today_tasks = [task for task in tasks_list if convert_to_datetime(task[3]).date() == today_date]
+                    sorted_data = sorted(today_tasks, key=lambda x: convert_to_datetime(x[3]))
+                    result_title = f'**Today Tasks:**'
+                    result_description = f'**{user[0]}\'s tasks**'
+                    embed = discord.Embed(title=result_title, description=result_description, color=0xFF5733)
+                    file = discord.File('images/icon.png', filename='icon.png')
+                    embed.set_thumbnail(url='attachment://icon.png')
+                    embed.set_author(name="Reminder-Bot says:")
+                    if tasks_list > 0:
+                        for item in sorted_data:
+                            string = f'{item[2]} to {item[3]}'
+                            embed.add_field(name=item[1], value=string, inline=False)
+                    else:
+                         embed.add_field(name="No Tasks Schedule for Today", value="Have a Great Day!", inline=False)
+                    embed.set_footer(text=client.user.mention)
+                    await user.send(file=file, embed=embed)
+            await asyncio.sleep(30)
 
     async def process_command(message : discord.message.Message, client : discord.Client):
-        userDatabase = UserDatabase('user_database.db')
         if message.content == '!hello':
             await regular_response.hello(message)
         elif message.content == '!time':
@@ -83,7 +107,6 @@ def run_discord_bot():
             await regular_response.help(message, client)
         else:
             await regular_response.invalidInput(message, client)
-        userDatabase.close()
 
     client.run(TOKEN)
     
