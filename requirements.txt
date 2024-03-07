@@ -1,0 +1,7 @@
+discord
+python-dotenv
+datetime
+pandas
+tabulate
+sqlite3
+regex
