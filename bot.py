@@ -45,41 +45,41 @@ def run_discord_bot():
                 await process_command(message, client)
     
     async def ping_at_specific_time(client : discord.Client):
-        # while True:            
-        userDatabase = UserDatabase('user_database.db')
-        user_list = userDatabase.get_all_users()
-        current_time = datetime.datetime.now().strftime("%H:%M")
-        for user_index in user_list:
-            if current_time == user_index[2]:
-                print(f'{current_time} BOT PINGED')
-                user = await client.fetch_user(user_index[1])
-                tasks_list = userDatabase.get_tasks_by_id(user_index[1])
-                def convert_to_datetime(date_str):
-                    try:
-                        return datetime.datetime.strptime(date_str, "%Y%m%dT%H:%M:%S")
-                    except ValueError:
-                        print(f"Error: Invalid date string encountered: {date_str}")
-                        return None
-                today_date = datetime.datetime.today().date()
-                today_tasks = [task for task in tasks_list if convert_to_datetime(task[3]).date() == today_date]
-                sorted_data = sorted(today_tasks, key=lambda x: convert_to_datetime(x[3]))
-                result_title = f'**Today Tasks:**'
-                result_description = f'**{user_index[0]}\'s tasks**'
-                embed = discord.Embed(title=result_title, description=result_description, color=0xFF5733)
-                file = discord.File('images/icon.png', filename='icon.png')
-                embed.set_thumbnail(url='attachment://icon.png')
-                embed.set_author(name="Reminder-Bot says:")
-                print(len(today_tasks))
-                if len(today_tasks) > 0:
-                    for item in sorted_data:
-                        string = f'{item[2]} to {item[3]}'
-                        embed.add_field(name=item[1], value=string, inline=False)
-                else:
-                        embed.add_field(name="No Tasks Schedule for Today", value="Have a Great Day!", inline=False)
-                embed.set_footer(text=client.user.mention)
-                await user.send(file=file, embed=embed)
-        userDatabase.close()
-        await asyncio.sleep(60)
+        while True:            
+            userDatabase = UserDatabase('user_database.db')
+            user_list = userDatabase.get_all_users()
+            current_time = datetime.datetime.now().strftime("%H:%M")
+            for user_index in user_list:
+                if current_time == user_index[2]:
+                    print(f'{current_time} BOT PINGED')
+                    user = await client.fetch_user(user_index[1])
+                    tasks_list = userDatabase.get_tasks_by_id(user_index[1])
+                    def convert_to_datetime(date_str):
+                        try:
+                            return datetime.datetime.strptime(date_str, "%Y%m%dT%H:%M:%S")
+                        except ValueError:
+                            print(f"Error: Invalid date string encountered: {date_str}")
+                            return None
+                    today_date = datetime.datetime.today().date()
+                    today_tasks = [task for task in tasks_list if convert_to_datetime(task[3]).date() == today_date]
+                    sorted_data = sorted(today_tasks, key=lambda x: convert_to_datetime(x[3]))
+                    result_title = f'**Today Tasks:**'
+                    result_description = f'**{user_index[0]}\'s tasks**'
+                    embed = discord.Embed(title=result_title, description=result_description, color=0xFF5733)
+                    file = discord.File('images/icon.png', filename='icon.png')
+                    embed.set_thumbnail(url='attachment://icon.png')
+                    embed.set_author(name="Reminder-Bot says:")
+                    print(len(today_tasks))
+                    if len(today_tasks) > 0:
+                        for item in sorted_data:
+                            string = f'{item[2]} to {item[3]}'
+                            embed.add_field(name=item[1], value=string, inline=False)
+                    else:
+                            embed.add_field(name="No Tasks Schedule for Today", value="Have a Great Day!", inline=False)
+                    embed.set_footer(text=client.user.mention)
+                    await user.send(file=file, embed=embed)
+            userDatabase.close()
+            await asyncio.sleep(60)
 
     async def process_command(message : discord.message.Message, client : discord.Client):
         userDatabase = UserDatabase('user_database.db')
