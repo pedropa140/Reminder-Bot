@@ -13,7 +13,7 @@ class UserDatabase:
         self.cursor.execute('''CREATE TABLE IF NOT EXISTS users
                             (discord_name TEXT, discord_id TEXT PRIMARY KEY, time_preference TEXT)''')
         self.cursor.execute('''CREATE TABLE IF NOT EXISTS user_tasks
-                            (discord_id TEXT, task_name TEXT PRIMARY KEY, start_time TEXT, end_time TEXT, completed BOOLEAN)''')
+                            (discord_id TEXT, task_name TEXT KEY, start_time TEXT, end_time TEXT, completed BOOLEAN)''')
 
         self.conn.commit()
 
@@ -50,6 +50,11 @@ class UserDatabase:
         self.cursor.execute("SELECT * FROM user_tasks WHERE task_name=?", (task_name,))
         return self.cursor.fetchone()
 
+    def get_task_names_by_id(self, discord_id):
+        self.cursor.execute("SELECT task_name FROM user_tasks WHERE discord_id=?", (discord_id,))
+        task_names = self.cursor.fetchall()
+        return [task[0] for task in task_names]
+    
     def get_tasks_by_id(self, discord_id):
         self.cursor.execute("SELECT * FROM user_tasks WHERE discord_id=?", (discord_id,))
         return self.cursor.fetchall()
