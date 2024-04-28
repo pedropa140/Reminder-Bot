@@ -325,3 +325,98 @@ async def alltask(message : discord.message.Message, client : discord.Client, us
         embed.set_author(name="Reminder-Bot says:")
         embed.set_footer(text="!todaytask")
         await message.channel.send(file=file, embed=embed)
+
+async def removetask(message : discord.message.Message, client : discord.Client, userDatabase : UserDatabase):
+    if userDatabase.user_exists(str(message.author.id)):
+        creds = None
+        username_string = f'token/token_{str(message.author.id)}.json'
+        if os.path.exists(username_string):
+            creds = Credentials.from_authorized_user_file(username_string, SCOPES)        
+
+        if not creds or not creds.valid:
+            if creds and creds.expired and creds.refresh_token:
+                try:
+                    creds.refresh(Request())
+                except Exception as e:
+                    if os.path.exists(username_string):
+                        os.remove(username_string)
+            else:
+                flow = InstalledAppFlow.from_client_secrets_file("credentials.json", SCOPES)
+                creds = flow.run_local_server(port = 0)
+
+                with open(username_string, "w") as token:
+                    token.write(creds.to_json())
+        service = build("calendar", "v3", credentials = creds)
+        now = datetime.datetime.now().isoformat() + "Z"
+        event_result = service.events().list(calendarId = "primary", timeMin=now, maxResults = 10, singleEvents = True, orderBy = "startTime").execute()
+        events = event_result.get("items", [])
+        if len(events) == 0:
+            result_title = f'**Error**'
+            result_description = f'No Tasks On Your Schedule!'
+            embed = discord.Embed(title=result_title, description=result_description, color=0xFF5733)
+            file = discord.File('images/icon.png', filename='icon.png')
+            embed.set_thumbnail(url='attachment://icon.png')
+            embed.set_author(name="Reminder-Bot says:")
+            embed.set_footer(text="!removetask")
+            await message.channel.send(file=file, embed=embed)
+        else:
+            sorted_data = sorted(events, key=lambda x: x['end']['dateTime'])
+            # for event in events:
+            #     events_dictionary[counter] = [event['summary'].replace('"', ''), event['start']['dateTime'][:19], event['end']['dateTime'][:19], event.get('htmlLink')]
+            #     counter += 1
+            result_title = f'**Type the Number Assigned to the Task**'
+            result_description = f'**Please Enter the Number Assigned Next to the Task.**'
+            embed = discord.Embed(title=result_title, description=result_description, color=0xFF5733)
+            file = discord.File('images/icon.png', filename='icon.png')
+            embed.set_thumbnail(url='attachment://icon.png')
+            embed.set_author(name="Reminder-Bot says:")
+            counter = 1
+            for item in sorted_data:
+                # string = f'{i[2]} to {i[3]}'
+                string = f'**Start Time: ** {datetime.datetime.strptime(item['start']['dateTime'][:19], "%Y-%m-%dT%H:%M:%S").strftime("%B %d, %Y %I:%M:%S %p")}\n**End Time: **{datetime.datetime.strptime(item['end']['dateTime'][:19], "%Y-%m-%dT%H:%M:%S").strftime("%B %d, %Y %I:%M:%S %p")}\n**Link: **{item['htmlLink']}'
+                embed.add_field(name=str(counter) + "\t" + item['summary'].replace('"', ''), value=string, inline=False)
+                counter += 1
+            embed.set_footer(text="!removetask")
+            await message.channel.send(file=file, embed=embed)
+            def check(m):
+                return m.author == message.author and m.channel == message.channel
+            try:
+                removedtask_action = await client.wait_for('message', check=check, timeout=30)
+                removetask_action_content = removedtask_action.content 
+            except asyncio.TimeoutError:
+                string = f'{message.author.mention} has taken too long to respond.'
+                embed = discord.Embed(title= "Timeout Error", description=string, color=0xFF5733)
+                file = discord.File('images/icon.png', filename='icon.png')
+                embed.set_thumbnail(url='attachment://icon.png')
+                embed.set_author(name="Reminder-Bot says:")
+                embed.set_footer(text="!removetask")
+                await message.channel.send(file=file, embed=embed)
+                return
+            if 0 < int(removetask_action_content) < len(sorted_data) + 1 and removetask_action_content.isdigit():
+                service.events().delete(calendarId='primary', eventId=sorted_data[int(removetask_action_content) - 1]['id']).execute()
+                result_title = f'**Task Deleted**'
+                result_description = f'{sorted_data[int(removetask_action_content) - 1]['summary']} has been deleted!'
+                embed = discord.Embed(title=result_title, description=result_description, color=0xFF5733)
+                file = discord.File('images/icon.png', filename='icon.png')
+                embed.set_thumbnail(url='attachment://icon.png')
+                embed.set_author(name="Reminder-Bot says:")
+                embed.set_footer(text="!removetask")
+                await message.channel.send(file=file, embed=embed)
+            else:
+                result_title = f'**Error**'
+                result_description = f'Invalid Input. Please try again.'
+                embed = discord.Embed(title=result_title, description=result_description, color=0xFF5733)
+                file = discord.File('images/icon.png', filename='icon.png')
+                embed.set_thumbnail(url='attachment://icon.png')
+                embed.set_author(name="Reminder-Bot says:")
+                embed.set_footer(text="!removetask")
+                await message.channel.send(file=file, embed=embed)
+    else:
+        result_title = f'Account Not Found'
+        result_description = f'User not found for for **{message.author.mention}**'
+        embed = discord.Embed(title=result_title, description=result_description, color=0xFF5733)
+        file = discord.File('images/icon.png', filename='icon.png')
+        embed.set_thumbnail(url='attachment://icon.png')
+        embed.set_author(name="Reminder-Bot says:")
+        embed.set_footer(text="!removetask")
+        await message.channel.send(file=file, embed=embed)
