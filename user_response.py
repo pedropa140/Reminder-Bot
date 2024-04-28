@@ -28,8 +28,8 @@ async def adduser(message : discord.message.Message, client : discord.Client, us
         
         def check(m):
             return m.author == message.author and m.channel == message.channel
-        prefered_time = await client.wait_for('message', check=check, timeout=30)
         try:
+            prefered_time = await client.wait_for('message', check=check, timeout=30)
             def validate_time(time_str):
                 hours, minutes = time_str.split(':')
                 if not hours.isdigit() or not minutes.isdigit():
@@ -112,8 +112,8 @@ async def changereminder(message : discord.message.Message, client : discord.Cli
         
         def check(m):
             return m.author == message.author and m.channel == message.channel
-        reminder_action = await client.wait_for('message', check=check, timeout=30)
         try:
+            reminder_action = await client.wait_for('message', check=check, timeout=30)
             reminder_action_content = reminder_action.content
             def validate_time(time_str):
                 hours, minutes = time_str.split(':')
@@ -176,8 +176,8 @@ async def deleteuser(message : discord.message.Message, client : discord.Client,
         
         def check(m):
             return m.author == message.author and m.channel == message.channel
-        exit_action = await client.wait_for('message', check=check, timeout=30)
         try:
+            exit_action = await client.wait_for('message', check=check, timeout=30)
             exit_action_content = exit_action.content
             if exit_action_content.upper() == 'YES':
                 userDatabase.delete_user(str(message.author.id))
