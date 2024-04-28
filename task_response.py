@@ -395,7 +395,7 @@ async def removetask(message : discord.message.Message, client : discord.Client,
             if 0 < int(removetask_action_content) < len(sorted_data) + 1 and removetask_action_content.isdigit():
                 service.events().delete(calendarId='primary', eventId=sorted_data[int(removetask_action_content) - 1]['id']).execute()
                 result_title = f'**Task Deleted**'
-                result_description = f'{sorted_data[int(removetask_action_content) - 1]['summary']} has been deleted!'
+                result_description = f'**{sorted_data[int(removetask_action_content) - 1]['summary']}** has been deleted!'
                 embed = discord.Embed(title=result_title, description=result_description, color=0xFF5733)
                 file = discord.File('images/icon.png', filename='icon.png')
                 embed.set_thumbnail(url='attachment://icon.png')
