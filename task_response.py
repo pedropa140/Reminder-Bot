@@ -236,15 +236,6 @@ async def todaytask(message : discord.message.Message, client : discord.Client, 
         event_result = service.events().list(calendarId = "primary", timeMin=now, maxResults = 10, singleEvents = True, orderBy = "startTime").execute()
 
         events = event_result.get("items", [])
-        if not events:
-            print("No upcoming events found!")
-        else:
-            discord_id = str(message.author.id)    
-            tasks_names = userDatabase.get_task_names_by_id(discord_id)
-            for event in events:
-                event_name = event['summary'].replace('"', '')
-                event_start = event['start']['dateTime'][:19]
-                event_end = event['end']['dateTime'][:19]
         def convert_to_datetime(date_str):
             try:
                 return datetime.datetime.strptime(date_str, "%Y-%m-%dT%H:%M:%S")
@@ -260,9 +251,69 @@ async def todaytask(message : discord.message.Message, client : discord.Client, 
         file = discord.File('images/icon.png', filename='icon.png')
         embed.set_thumbnail(url='attachment://icon.png')
         embed.set_author(name="Reminder-Bot says:")
-        for item in sorted_data:
-            string = f'**Start Time: ** {datetime.datetime.strptime(item['start']['dateTime'][:19], "%Y-%m-%dT%H:%M:%S").strftime("%B %d, %Y %I:%M:%S %p")}\n**End Time: **{datetime.datetime.strptime(item['end']['dateTime'][:19], "%Y-%m-%dT%H:%M:%S").strftime("%B %d, %Y %I:%M:%S %p")}\n**Link: **{event['htmlLink']}'
-            embed.add_field(name=item['summary'].replace('"', ''), value=string, inline=False)
+        if len(sorted_data) > 0:
+            for item in sorted_data:
+                string = f'**Start Time: ** {datetime.datetime.strptime(item['start']['dateTime'][:19], "%Y-%m-%dT%H:%M:%S").strftime("%B %d, %Y %I:%M:%S %p")}\n**End Time: **{datetime.datetime.strptime(item['end']['dateTime'][:19], "%Y-%m-%dT%H:%M:%S").strftime("%B %d, %Y %I:%M:%S %p")}\n**Link: **{item['htmlLink']}'
+                embed.add_field(name=item['summary'].replace('"', ''), value=string, inline=False)
+        else:
+            embed.add_field(name="No Tasks Schedule For Today", value="Have A Great Day!", inline=False)
+        embed.set_footer(text="!todaytask")
+        await message.channel.send(file=file, embed=embed)
+    else:
+        result_title = f'Account Not Found'
+        result_description = f'User not found for for **{message.author.mention}**'
+        embed = discord.Embed(title=result_title, description=result_description, color=0xFF5733)
+        file = discord.File('images/icon.png', filename='icon.png')
+        embed.set_thumbnail(url='attachment://icon.png')
+        embed.set_author(name="Reminder-Bot says:")
+        embed.set_footer(text="!todaytask")
+        await message.channel.send(file=file, embed=embed)
+
+async def alltask(message : discord.message.Message, client : discord.Client, userDatabase : UserDatabase):
+    if userDatabase.user_exists(str(message.author.id)):
+        creds = None
+        username_string = f'token/token_{str(message.author.id)}.json'
+        if os.path.exists(username_string):
+            creds = Credentials.from_authorized_user_file(username_string, SCOPES)        
+
+        if not creds or not creds.valid:
+            if creds and creds.expired and creds.refresh_token:
+                try:
+                    creds.refresh(Request())
+                except Exception as e:
+                    if os.path.exists(username_string):
+                        os.remove(username_string)
+            else:
+                flow = InstalledAppFlow.from_client_secrets_file("credentials.json", SCOPES)
+                creds = flow.run_local_server(port = 0)
+
+                with open(username_string, "w") as token:
+                    token.write(creds.to_json())
+        service = build("calendar", "v3", credentials = creds)
+        now = datetime.datetime.now().isoformat() + "Z"
+        event_result = service.events().list(calendarId = "primary", timeMin=now, maxResults = 10, singleEvents = True, orderBy = "startTime").execute()
+
+        events = event_result.get("items", [])
+        def convert_to_datetime(date_str):
+            try:
+                return datetime.datetime.strptime(date_str, "%Y-%m-%dT%H:%M:%S")
+            except ValueError:
+                print(f"Error: Invalid date string encountered: {date_str}")
+                return None
+        today_tasks = [task for task in events]
+        sorted_data = sorted(today_tasks, key=lambda x: x['end']['dateTime'])
+        result_title = f'**Today Tasks:**'
+        result_description = f'**{message.author.mention}\'s tasks**'
+        embed = discord.Embed(title=result_title, description=result_description, color=0xFF5733)
+        file = discord.File('images/icon.png', filename='icon.png')
+        embed.set_thumbnail(url='attachment://icon.png')
+        embed.set_author(name="Reminder-Bot says:")
+        if len(sorted_data) > 0:
+            for item in sorted_data:
+                string = f'**Start Time: ** {datetime.datetime.strptime(item['start']['dateTime'][:19], "%Y-%m-%dT%H:%M:%S").strftime("%B %d, %Y %I:%M:%S %p")}\n**End Time: **{datetime.datetime.strptime(item['end']['dateTime'][:19], "%Y-%m-%dT%H:%M:%S").strftime("%B %d, %Y %I:%M:%S %p")}\n**Link: **{item['htmlLink']}'
+                embed.add_field(name=item['summary'].replace('"', ''), value=string, inline=False)
+        else:
+            embed.add_field(name="No Tasks Schedule For Today", value="Have A Great Day!", inline=False)
         embed.set_footer(text="!todaytask")
         await message.channel.send(file=file, embed=embed)
     else:
