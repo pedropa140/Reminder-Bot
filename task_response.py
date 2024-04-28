@@ -361,9 +361,6 @@ async def removetask(message : discord.message.Message, client : discord.Client,
             await message.channel.send(file=file, embed=embed)
         else:
             sorted_data = sorted(events, key=lambda x: x['end']['dateTime'])
-            # for event in events:
-            #     events_dictionary[counter] = [event['summary'].replace('"', ''), event['start']['dateTime'][:19], event['end']['dateTime'][:19], event.get('htmlLink')]
-            #     counter += 1
             result_title = f'**Type the Number Assigned to the Task**'
             result_description = f'**Please Enter the Number Assigned Next to the Task.**'
             embed = discord.Embed(title=result_title, description=result_description, color=0xFF5733)
@@ -420,3 +417,4 @@ async def removetask(message : discord.message.Message, client : discord.Client,
         embed.set_author(name="Reminder-Bot says:")
         embed.set_footer(text="!removetask")
         await message.channel.send(file=file, embed=embed)
+

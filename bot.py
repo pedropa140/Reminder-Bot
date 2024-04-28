@@ -4,6 +4,7 @@ import os
 from dotenv import load_dotenv
 import asyncio
 import random
+import schedule
 import datetime
 
 import regular_response
@@ -103,8 +104,8 @@ def run_discord_bot():
             await task_response.alltask(message, client, userDatabase)
         elif message.content == '!removetask':
             await task_response.removetask(message, client, userDatabase)
-        elif message.content == '!completetask':
-            await task_response.completetask(message, client, userDatabase)
+        # elif message.content == '!completetask':
+        #     await task_response.completetask(message, client, userDatabase)
         elif message.content == '!pomodoro':
             await regular_response.pomodoro(message, client)
         elif message.content == '!help':
