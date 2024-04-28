@@ -2,4 +2,4 @@
 gitpush.py
 user_database.db
 credentials.json
-token.json
+token/

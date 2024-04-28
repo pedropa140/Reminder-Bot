@@ -149,21 +149,23 @@ async def addtask(message : discord.message.Message, client : discord.Client, us
         offset_string.insert(3, ':')
         timeZone = "".join(offset_string)
         creds = None
-        if os.path.exists("token.json"):
-            creds = Credentials.from_authorized_user_file("token.json", SCOPES)        
+        
+        username_string = f'token/token_{str(message.author.id)}.json'
+        if os.path.exists(username_string):
+            creds = Credentials.from_authorized_user_file(username_string, SCOPES)        
 
         if not creds or not creds.valid:
             if creds and creds.expired and creds.refresh_token:
                 try:
                     creds.refresh(Request())
                 except Exception as e:
-                    if os.path.exists("token.json"):
-                        os.remove("token.json")
+                    if os.path.exists(username_string):
+                        os.remove(username_string)
             else:
                 flow = InstalledAppFlow.from_client_secrets_file("credentials.json", SCOPES)
                 creds = flow.run_local_server(port = 0)
 
-                with open("token.json", "w") as token:
+                with open(username_string, "w") as token:
                     token.write(creds.to_json())
         service = build("calendar", "v3", credentials = creds)
         now = datetime.datetime.now().isoformat() + "Z"
@@ -218,21 +220,22 @@ async def addtask(message : discord.message.Message, client : discord.Client, us
 async def todaytask(message : discord.message.Message, client : discord.Client, userDatabase : UserDatabase):
     if userDatabase.user_exists(str(message.author.id)):
         creds = None
-        if os.path.exists("token.json"):
-            creds = Credentials.from_authorized_user_file("token.json", SCOPES)        
+        username_string = f'token/token_{str(message.author.id)}.json'
+        if os.path.exists(username_string):
+            creds = Credentials.from_authorized_user_file(username_string, SCOPES)        
 
         if not creds or not creds.valid:
             if creds and creds.expired and creds.refresh_token:
                 try:
                     creds.refresh(Request())
                 except Exception as e:
-                    if os.path.exists("token.json"):
-                        os.remove("token.json")
+                    if os.path.exists(username_string):
+                        os.remove(username_string)
             else:
                 flow = InstalledAppFlow.from_client_secrets_file("credentials.json", SCOPES)
                 creds = flow.run_local_server(port = 0)
 
-                with open("token.json", "w") as token:
+                with open(username_string, "w") as token:
                     token.write(creds.to_json())
         service = build("calendar", "v3", credentials = creds)
         now = datetime.datetime.now().isoformat() + "Z"
@@ -285,21 +288,22 @@ async def todaytask(message : discord.message.Message, client : discord.Client, 
 async def alltask(message : discord.message.Message, client : discord.Client, userDatabase : UserDatabase):
     if userDatabase.user_exists(str(message.author.id)):
         creds = None
-        if os.path.exists("token.json"):
-            creds = Credentials.from_authorized_user_file("token.json", SCOPES)        
+        username_string = f'token/token_{str(message.author.id)}.json'
+        if os.path.exists(username_string):
+            creds = Credentials.from_authorized_user_file(username_string, SCOPES)        
 
         if not creds or not creds.valid:
             if creds and creds.expired and creds.refresh_token:
                 try:
                     creds.refresh(Request())
                 except Exception as e:
-                    if os.path.exists("token.json"):
-                        os.remove("token.json")
+                    if os.path.exists(username_string):
+                        os.remove(username_string)
             else:
                 flow = InstalledAppFlow.from_client_secrets_file("credentials.json", SCOPES)
                 creds = flow.run_local_server(port = 0)
 
-                with open("token.json", "w") as token:
+                with open(username_string, "w") as token:
                     token.write(creds.to_json())
         service = build("calendar", "v3", credentials = creds)
         now = datetime.datetime.now().isoformat() + "Z"
@@ -361,21 +365,22 @@ async def alltask(message : discord.message.Message, client : discord.Client, us
 async def removetask(message : discord.message.Message, client : discord.Client, userDatabase : UserDatabase):
     if userDatabase.user_exists(str(message.author.id)):
         creds = None
-        if os.path.exists("token.json"):
-            creds = Credentials.from_authorized_user_file("token.json", SCOPES)        
+        username_string = f'token/token_{str(message.author.id)}.json'
+        if os.path.exists(username_string):
+            creds = Credentials.from_authorized_user_file(username_string, SCOPES)        
 
         if not creds or not creds.valid:
             if creds and creds.expired and creds.refresh_token:
                 try:
                     creds.refresh(Request())
                 except Exception as e:
-                    if os.path.exists("token.json"):
-                        os.remove("token.json")
+                    if os.path.exists(username_string):
+                        os.remove(username_string)
             else:
                 flow = InstalledAppFlow.from_client_secrets_file("credentials.json", SCOPES)
                 creds = flow.run_local_server(port = 0)
 
-                with open("token.json", "w") as token:
+                with open(username_string, "w") as token:
                     token.write(creds.to_json())
         service = build("calendar", "v3", credentials = creds)
         now = datetime.datetime.now().isoformat() + "Z"
@@ -460,21 +465,22 @@ async def removetask(message : discord.message.Message, client : discord.Client,
 async def completetask(message : discord.message.Message, client : discord.Client, userDatabase : UserDatabase):
     if userDatabase.user_exists(str(message.author.id)):
         creds = None
-        if os.path.exists("token.json"):
-            creds = Credentials.from_authorized_user_file("token.json", SCOPES)        
+        username_string = f'token/token_{str(message.author.id)}.json'
+        if os.path.exists(username_string):
+            creds = Credentials.from_authorized_user_file(username_string, SCOPES)        
 
         if not creds or not creds.valid:
             if creds and creds.expired and creds.refresh_token:
                 try:
                     creds.refresh(Request())
                 except Exception as e:
-                    if os.path.exists("token.json"):
-                        os.remove("token.json")
+                    if os.path.exists(username_string):
+                        os.remove(username_string)
             else:
                 flow = InstalledAppFlow.from_client_secrets_file("credentials.json", SCOPES)
                 creds = flow.run_local_server(port = 0)
 
-                with open("token.json", "w") as token:
+                with open(username_string, "w") as token:
                     token.write(creds.to_json())
         service = build("calendar", "v3", credentials = creds)
         now = datetime.datetime.now().isoformat() + "Z"
