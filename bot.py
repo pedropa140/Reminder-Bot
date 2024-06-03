@@ -12,6 +12,16 @@ import user_response
 import task_response
 from user import User, UserDatabase
 
+from google.auth import load_credentials_from_file
+from google.oauth2 import credentials
+from google.auth.transport.requests import Request
+from google.oauth2.credentials import Credentials
+from google_auth_oauthlib.flow import InstalledAppFlow
+from googleapiclient.discovery import build
+from googleapiclient.errors import HttpError
+
+SCOPES = ['https://www.googleapis.com/auth/calendar']
+
 load_dotenv()
 
 def run_discord_bot():
@@ -20,11 +30,15 @@ def run_discord_bot():
     intents.message_content = True
     client = discord.Client(intents=intents)
     userDatabase = UserDatabase('user_database.db')
-    
+    time_dictionary = {}
+    user_list = userDatabase.get_all_users()
+    for user_index in user_list:
+        if user_index[1] not in time_dictionary:
+            time_dictionary[user_index[1]] = [user_index[2], False]
     @client.event
     async def on_ready():
         print(f'{client.user} is now running!')
-        client.loop.create_task(ping_at_specific_time(client))
+        client.loop.create_task(ping_at_specific_time(client, time_dictionary))
     
     @client.event
     async def on_message(message : discord.message.Message):
@@ -45,40 +59,70 @@ def run_discord_bot():
             if message.content.startswith('!'):
                 await process_command(message, client)
     
-    async def ping_at_specific_time(client : discord.Client):
+    async def ping_at_specific_time(client : discord.Client, time_dictionary : dict):
         while True:            
-            userDatabase = UserDatabase('user_database.db')
+            userDatabase = UserDatabase('user_database.db')            
             user_list = userDatabase.get_all_users()
-            current_time = datetime.datetime.now().strftime("%H:%M")
             for user_index in user_list:
-                if current_time == user_index[2]:
-                    print(f'{current_time} BOT PINGED')
-                    user = await client.fetch_user(user_index[1])
-                    tasks_list = userDatabase.get_tasks_by_id(user_index[1])
+                if user_index[1] not in time_dictionary:
+                    time_dictionary[user_index[1]] = [user_index[2], False]
+                if (user_index[1] in time_dictionary and time_dictionary[user_index[1]][0] != user_index[2]):
+                    time_dictionary[user_index[1]] = [user_index[2], False]
+            current_time = datetime.datetime.now().strftime("%H:%M")
+            if current_time == "00:00":
+                for users in time_dictionary:
+                    time_dictionary[users][1] = False
+            for users in time_dictionary:
+                if current_time == time_dictionary[users][0] and time_dictionary[users][1] == False:
+                    creds = None
+                    username_string = f'token/token_{users}.json'
+                    if os.path.exists(username_string):
+                        creds = Credentials.from_authorized_user_file(username_string, SCOPES)        
+
+                    if not creds or not creds.valid:
+                        if creds and creds.expired and creds.refresh_token:
+                            try:
+                                creds.refresh(Request())
+                            except Exception as e:
+                                if os.path.exists(username_string):
+                                    os.remove(username_string)
+                        else:
+                            flow = InstalledAppFlow.from_client_secrets_file("credentials.json", SCOPES)
+                            creds = flow.run_local_server(port = 0)
+
+                            with open(username_string, "w") as token:
+                                token.write(creds.to_json())
+                    service = build("calendar", "v3", credentials = creds)
+                    now = datetime.datetime.now().isoformat() + "Z"
+                    event_result = service.events().list(calendarId = "primary", timeMin=now, maxResults = 10, singleEvents = True, orderBy = "startTime").execute()
+
+                    events = event_result.get("items", [])
                     def convert_to_datetime(date_str):
                         try:
-                            return datetime.datetime.strptime(date_str, "%Y%m%dT%H:%M:%S")
+                            return datetime.datetime.strptime(date_str, "%Y-%m-%dT%H:%M:%S")
                         except ValueError:
                             print(f"Error: Invalid date string encountered: {date_str}")
                             return None
                     today_date = datetime.datetime.today().date()
-                    today_tasks = [task for task in tasks_list if convert_to_datetime(task[3]).date() == today_date]
-                    sorted_data = sorted(today_tasks, key=lambda x: convert_to_datetime(x[3]))
+                    today_tasks = [task for task in events if convert_to_datetime(task['end']['dateTime'][:19]).date() == today_date]
+                    sorted_data = sorted(today_tasks, key=lambda x: x['end']['dateTime'])
+                    print(f'{current_time} BOT PINGED FOR {users}')
+                    user = await client.fetch_user(user_index[1])
                     result_title = f'**Today Tasks:**'
                     result_description = f'**{user_index[0]}\'s tasks**'
                     embed = discord.Embed(title=result_title, description=result_description, color=0xFF5733)
                     file = discord.File('images/icon.png', filename='icon.png')
                     embed.set_thumbnail(url='attachment://icon.png')
                     embed.set_author(name="Reminder-Bot says:")
-                    print(len(today_tasks))
-                    if len(today_tasks) > 0:
+                    if len(sorted_data) > 0:
                         for item in sorted_data:
-                            string = f'{item[2]} to {item[3]}'
-                            embed.add_field(name=item[1], value=string, inline=False)
+                            string = f'**Start Time: ** {datetime.datetime.strptime(item['start']['dateTime'][:19], "%Y-%m-%dT%H:%M:%S").strftime("%B %d, %Y %I:%M:%S %p")}\n**End Time: **{datetime.datetime.strptime(item['end']['dateTime'][:19], "%Y-%m-%dT%H:%M:%S").strftime("%B %d, %Y %I:%M:%S %p")}\n**Link: **{item['htmlLink']}'
+                            embed.add_field(name=item['summary'].replace('"', ''), value=string, inline=False)
                     else:
-                            embed.add_field(name="No Tasks Schedule for Today", value="Have a Great Day!", inline=False)
+                        embed.add_field(name="No Tasks Schedule For Today", value="Have A Great Day!", inline=False)
                     embed.set_footer(text=client.user.mention)
                     await user.send(file=file, embed=embed)
+                    time_dictionary[users][1] = True
             userDatabase.close()
             await asyncio.sleep(60)
 
@@ -104,8 +148,6 @@ def run_discord_bot():
             await task_response.alltask(message, client, userDatabase)
         elif message.content == '!removetask':
             await task_response.removetask(message, client, userDatabase)
-        # elif message.content == '!completetask':
-        #     await task_response.completetask(message, client, userDatabase)
         elif message.content == '!pomodoro':
             await regular_response.pomodoro(message, client)
         elif message.content == '!help':

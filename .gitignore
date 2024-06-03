@@ -1,4 +1,5 @@
 .env
+__pycache__/
 gitpush.py
 user_database.db
 credentials.json

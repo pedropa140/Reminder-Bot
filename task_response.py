@@ -11,7 +11,6 @@ from google.auth import load_credentials_from_file
 from google.oauth2 import credentials
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
-from google.generativeai import generative_models
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
@@ -169,7 +168,6 @@ async def addtask(message : discord.message.Message, client : discord.Client, us
         now = datetime.datetime.now().isoformat() + "Z"
         datetime_stuff = datetime.datetime.now()
         today_date = f'{datetime_stuff.year}-{datetime_stuff.month}-{datetime_stuff.day}T'
-        event_result = service.events().list(calendarId = "primary", timeMin=now, maxResults = 10, singleEvents = True, orderBy = "startTime").execute()
         taskSummary = addtask_action_content
         taskStart = addtask_start_action_content
         taskEnd = addtask_end_action_content

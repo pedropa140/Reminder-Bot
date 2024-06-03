@@ -8,6 +8,7 @@ import datetime
 
 from user import User, UserDatabase
 
+
 pomodoro_running = True
 
 async def hello(message : discord.message.Message):

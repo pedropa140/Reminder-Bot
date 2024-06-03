@@ -1,7 +1,7 @@
-discord
-python-dotenv
-datetime
-pandas
-tabulate
-sqlite3
-regex
+discord.py==2.3.2
+google_api_python_client==2.131.0
+google_auth_oauthlib==1.2.0
+protobuf==5.27.0
+python-dotenv==1.0.1
+regex==2024.5.15
+schedule==1.2.2
