@@ -143,6 +143,25 @@ def run_discord_bot():
         channel = str(interaction.channel)
         print(f'{username} ({mention}) said: "{user_message}" ({channel})')
         await regular_response.time(interaction)
+        
+    @bot.tree.command(name = "adduser")
+    @app_commands.describe(time_reminder = "What time do you want to be reminded?")
+    async def time(interaction : discord.Interaction, time_reminder : str):
+        username = str(interaction.user)
+        mention = str(interaction.user.mention)
+        user_message = str(interaction.command.name)
+        channel = str(interaction.channel)
+        print(f'{username} ({mention}) said: "{user_message} with parameters: {time_reminder}" ({channel})')
+        await user_response.adduser(interaction, time_reminder, userDatabase)
+
+    @bot.tree.command(name = "userinfo")
+    async def time(interaction : discord.Interaction):
+        username = str(interaction.user)
+        mention = str(interaction.user.mention)
+        user_message = str(interaction.command.name)
+        channel = str(interaction.channel)
+        print(f'{username} ({mention}) said: "{user_message}" ({channel})')
+        await user_response.userinfo(interaction, userDatabase)
 
     # async def process_command(message : discord.message.Message, client : discord.Client):
     #     userDatabase = UserDatabase('user_database.db')
