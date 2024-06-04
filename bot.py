@@ -1,4 +1,5 @@
 import discord
+from discord import app_commands
 from discord.ext import commands
 import os
 from dotenv import load_dotenv
@@ -26,40 +27,38 @@ load_dotenv()
 
 def run_discord_bot():
     TOKEN = os.getenv('DISCORD_TOKEN')
-    intents = discord.Intents.default()
+    intents = discord.Intents.all()
     intents.message_content = True
-    client = discord.Client(intents=intents)
+    bot = commands.Bot(command_prefix="!", intents=intents)
     userDatabase = UserDatabase('user_database.db')
     time_dictionary = {}
     user_list = userDatabase.get_all_users()
     for user_index in user_list:
         if user_index[1] not in time_dictionary:
             time_dictionary[user_index[1]] = [user_index[2], False]
-    @client.event
-    async def on_ready():
-        print(f'{client.user} is now running!')
-        client.loop.create_task(ping_at_specific_time(client, time_dictionary))
-    
-    @client.event
-    async def on_message(message : discord.message.Message):
-        if message.author == client.user:
-            return
-        username = str(message.author)
-        mention = str(message.author.mention)
-        user_message = str(message.content)
-        channel = str(message.channel)
-        print(f'{username} ({mention}) said: "{user_message}" ({channel})')
 
-        if client.user.mentioned_in(message):
-            message_content = str(message.content)
-            parts = message_content.split()
-            if len(parts) >= 2:
-                command = parts[1]
-                message.content = command
-            if message.content.startswith('!'):
-                await process_command(message, client)
+    @bot.event
+    async def on_ready():
+        print(f'{bot.user} is now running!')
+        try:
+            synced = await bot.tree.sync()
+            print(f'Synced {synced} command(s)')
+            print(f'Synced {len(synced)} command(s)')
+            bot.loop.create_task(ping_at_specific_time(bot, time_dictionary))
+        except Exception as e:
+            print(e)        
     
-    async def ping_at_specific_time(client : discord.Client, time_dictionary : dict):
+    # @bot.event
+    # async def on_message(message : str):
+    #     print(message)
+    #     # print(bot.on_message())
+    #     username = str(message.author)
+    #     mention = str(message.author.mention)
+    #     user_message = str(message.content)
+    #     channel = str(message.channel)
+    #     print(f'{username} ({mention}) said: "{user_message}" ({channel})')
+    
+    async def ping_at_specific_time(bot : commands.Bot, time_dictionary : dict):
         while True:            
             userDatabase = UserDatabase('user_database.db')            
             user_list = userDatabase.get_all_users()
@@ -72,6 +71,7 @@ def run_discord_bot():
             if current_time == "00:00":
                 for users in time_dictionary:
                     time_dictionary[users][1] = False
+            print(time_dictionary)
             for users in time_dictionary:
                 if current_time == time_dictionary[users][0] and time_dictionary[users][1] == False:
                     creds = None
@@ -107,7 +107,7 @@ def run_discord_bot():
                     today_tasks = [task for task in events if convert_to_datetime(task['end']['dateTime'][:19]).date() == today_date]
                     sorted_data = sorted(today_tasks, key=lambda x: x['end']['dateTime'])
                     print(f'{current_time} BOT PINGED FOR {users}')
-                    user = await client.fetch_user(user_index[1])
+                    user = await bot.fetch_user(user_index[1])
                     result_title = f'**Today Tasks:**'
                     result_description = f'**{user_index[0]}\'s tasks**'
                     embed = discord.Embed(title=result_title, description=result_description, color=0xFF5733)
@@ -120,41 +120,61 @@ def run_discord_bot():
                             embed.add_field(name=item['summary'].replace('"', ''), value=string, inline=False)
                     else:
                         embed.add_field(name="No Tasks Schedule For Today", value="Have A Great Day!", inline=False)
-                    embed.set_footer(text=client.user.mention)
+                    embed.set_footer(text=bot.user.mention)
                     await user.send(file=file, embed=embed)
                     time_dictionary[users][1] = True
             userDatabase.close()
             await asyncio.sleep(60)
+    
+    @bot.tree.command(name = "hello")
+    async def hello(interaction : discord.Interaction):
+        username = str(interaction.user)
+        mention = str(interaction.user.mention)
+        user_message = str(interaction.command.name)
+        channel = str(interaction.channel)
+        print(f'{username} ({mention}) said: "{user_message}" ({channel})')
+        await regular_response.hello(interaction)
 
-    async def process_command(message : discord.message.Message, client : discord.Client):
-        userDatabase = UserDatabase('user_database.db')
-        if message.content == '!hello':
-            await regular_response.hello(message)
-        elif message.content == '!time':
-            await regular_response.time(message)
-        elif message.content == '!adduser':
-            await user_response.adduser(message, client, userDatabase)
-        elif message.content == '!userinfo':
-            await user_response.userinfo(message, client, userDatabase)
-        elif message.content == '!changereminder':
-            await user_response.changereminder(message, client, userDatabase)
-        elif message.content == '!deleteuser':
-            await user_response.deleteuser(message, client, userDatabase)
-        elif message.content == '!addtask':
-            await task_response.addtask(message, client, userDatabase)
-        elif message.content == '!todaytask':
-            await task_response.todaytask(message, client, userDatabase)
-        elif message.content == '!alltasks':
-            await task_response.alltask(message, client, userDatabase)
-        elif message.content == '!removetask':
-            await task_response.removetask(message, client, userDatabase)
-        elif message.content == '!pomodoro':
-            await regular_response.pomodoro(message, client)
-        elif message.content == '!help':
-            await regular_response.help(message, client)
-        else:
-            await regular_response.invalidInput(message, client)
-        userDatabase.close()
+    @bot.tree.command(name = "time")
+    async def time(interaction : discord.Interaction):
+        username = str(interaction.user)
+        mention = str(interaction.user.mention)
+        user_message = str(interaction.command.name)
+        channel = str(interaction.channel)
+        print(f'{username} ({mention}) said: "{user_message}" ({channel})')
+        await regular_response.time(interaction)
 
-    client.run(TOKEN)
+    # async def process_command(message : discord.message.Message, client : discord.Client):
+    #     userDatabase = UserDatabase('user_database.db')
+    #     if message.content == '!hello':
+    #         await regular_response.hello(message)
+    #     elif message.content == '!time':
+    #         await regular_response.time(message)
+    #     elif message.content == '!adduser':
+    #         await user_response.adduser(message, client, userDatabase)
+    #     elif message.content == '!userinfo':
+    #         await user_response.userinfo(message, client, userDatabase)
+    #     elif message.content == '!changereminder':
+    #         await user_response.changereminder(message, client, userDatabase)
+    #     elif message.content == '!deleteuser':
+    #         await user_response.deleteuser(message, client, userDatabase)
+    #     elif message.content == '!addtask':
+    #         await task_response.addtask(message, client, userDatabase)
+    #     elif message.content == '!todaytask':
+    #         await task_response.todaytask(message, client, userDatabase)
+    #     elif message.content == '!alltasks':
+    #         await task_response.alltask(message, client, userDatabase)
+    #     elif message.content == '!removetask':
+    #         await task_response.removetask(message, client, userDatabase)
+    #     elif message.content == '!pomodoro':
+    #         await regular_response.pomodoro(message, client)
+    #     elif message.content == '!help':
+    #         await regular_response.help(message, client)
+    #     else:
+    #         await regular_response.invalidInput(message, client)
+    #     userDatabase.close()
+
+
+
+    bot.run(TOKEN)
     
