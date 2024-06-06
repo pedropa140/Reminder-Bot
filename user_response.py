@@ -12,9 +12,20 @@ from google.auth import load_credentials_from_file
 from google.oauth2 import credentials
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
-from google_auth_oauthlib.flow import InstalledAppFlow
+# from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
+
+from flow import InstalledAppFlow2, _WSGIRequestHandler, _RedirectWSGIApp
+from string import ascii_letters, digits
+import webbrowser
+import wsgiref.simple_server
+import wsgiref.util
+
+import google.auth.transport.requests
+import google.oauth2.credentials
+
+import google_auth_oauthlib.helpers
 
 SCOPES = ['https://www.googleapis.com/auth/calendar']
 
@@ -36,7 +47,6 @@ async def adduser(interaction : discord.Interaction, time_reminder : str, userDa
         if os.path.exists(username_string):
             creds = Credentials.from_authorized_user_file(username_string, SCOPES)
 
-        await interaction.response.defer()
         if not creds or not creds.valid:
             if creds and creds.expired and creds.refresh_token:
                 try:
@@ -45,21 +55,79 @@ async def adduser(interaction : discord.Interaction, time_reminder : str, userDa
                     if os.path.exists(username_string):
                         os.remove(username_string)
             else:
+                _DEFAULT_AUTH_PROMPT_MESSAGE = (
+                    "Please visit this URL to authorize this application: {url}"
+                )
+                """str: The message to display when prompting the user for
+                authorization."""
+                _DEFAULT_AUTH_CODE_MESSAGE = "Enter the authorization code: "
+                """str: The message to display when prompting the user for the
+                authorization code. Used only by the console strategy."""
+
+                _DEFAULT_WEB_SUCCESS_MESSAGE = (
+                    "The authentication flow has completed. You may close this window."
+                )
+                flow = InstalledAppFlow2.from_client_secrets_file("credentials.json", SCOPES)
+                host="localhost"
+                bind_addr=None
+                port=8080
+                authorization_prompt_message=_DEFAULT_AUTH_PROMPT_MESSAGE
+                success_message=_DEFAULT_WEB_SUCCESS_MESSAGE
+                open_browser=True
+                redirect_uri_trailing_slash=True
+                timeout_seconds=None
+                token_audience=None
+                browser=None
                 
-                flow = InstalledAppFlow.from_client_secrets_file("credentials.json", SCOPES)
+                await interaction.response.defer()
+                # print(flow.authorization_url())
+                # print(flow.redirect_uri)
+                # creds = flow.run_local_server(port = 0)
 
-                auth_url, _ = flow.authorization_url()
-                await interaction.followup.send(f"OPEN FOR GOOGLE CALENDAR PERMISSION: {auth_url}")
-                while True:
-                    try:
-                        
-                        flow.fetch_token(code = None)
-                        
-                        creds = flow.credentials
-                        break
-                    except Exception as e:
-                        continue
+                # with open(username_string, "w") as token:
+                #     token.write(creds.to_json())
 
+                wsgi_app = _RedirectWSGIApp(success_message)
+                # Fail fast if the address is occupied
+                wsgiref.simple_server.WSGIServer.allow_reuse_address = False
+                local_server = wsgiref.simple_server.make_server(
+                    bind_addr or host, port, wsgi_app, handler_class=_WSGIRequestHandler
+                )
+
+                try:
+                    redirect_uri_format = (
+                        "http://{}:{}/" if redirect_uri_trailing_slash else "http://{}:{}"
+                    )
+                    flow.redirect_uri = redirect_uri_format.format(
+                        host, local_server.server_port
+                    )
+                    auth_url, _ = flow.authorization_url()
+                    userDatabase.add_user(User(str(interaction.user), str(interaction.user.id), time_reminder))
+                    result_title = f'**ALLOW ACCESS**'
+                    result_description = f'Please click on this link to allow access to Google Calendars**'
+                    embed = discord.Embed(title=result_title, description=result_description, color=0xFF5733)
+                    file = discord.File('images/icon.png', filename='icon.png')
+                    embed.add_field(name="LINK", value=auth_url, inline=False)
+                    embed.set_thumbnail(url='attachment://icon.png')
+                    embed.set_author(name="Reminder-Bot says:")
+                    embed.set_footer(text="/adduser")
+                    await interaction.followup.send(file=file, embed=embed, ephemeral=False)
+
+                    if authorization_prompt_message:
+                        print(authorization_prompt_message.format(url=auth_url))
+
+                    local_server.timeout = timeout_seconds
+                    local_server.handle_request()
+                    authorization_response = wsgi_app.last_request_uri.replace("http", "https")
+                    flow.fetch_token(
+                        authorization_response=authorization_response, audience=token_audience
+                    )
+                finally:
+                    local_server.server_close()
+                    print("ERROR")
+
+                print(f'credentials: {flow.credentials}')
+                creds = flow.credentials
                 with open(username_string, "w") as token:
                     token.write(creds.to_json())
         
