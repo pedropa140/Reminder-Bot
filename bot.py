@@ -15,6 +15,7 @@ from user import User, UserDatabase
 
 from google.auth import load_credentials_from_file
 from google.oauth2 import credentials
+from google_auth_oauthlib.flow import Flow
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
@@ -36,27 +37,6 @@ def run_discord_bot():
     for user_index in user_list:
         if user_index[1] not in time_dictionary:
             time_dictionary[user_index[1]] = [user_index[2], False]
-
-    @bot.event
-    async def on_ready():
-        print(f'{bot.user} is now running!')
-        try:
-            synced = await bot.tree.sync()
-            print(f'Synced {synced} command(s)')
-            print(f'Synced {len(synced)} command(s)')
-            bot.loop.create_task(ping_at_specific_time(bot, time_dictionary))
-        except Exception as e:
-            print(e)        
-    
-    # @bot.event
-    # async def on_message(message : str):
-    #     print(message)
-    #     # print(bot.on_message())
-    #     username = str(message.author)
-    #     mention = str(message.author.mention)
-    #     user_message = str(message.content)
-    #     channel = str(message.channel)
-    #     print(f'{username} ({mention}) said: "{user_message}" ({channel})')
     
     async def ping_at_specific_time(bot : commands.Bot, time_dictionary : dict):
         while True:            
@@ -146,7 +126,7 @@ def run_discord_bot():
         
     @bot.tree.command(name = "adduser")
     @app_commands.describe(time_reminder = "What time do you want to be reminded?")
-    async def time(interaction : discord.Interaction, time_reminder : str):
+    async def adduser(interaction : discord.Interaction, time_reminder : str):
         username = str(interaction.user)
         mention = str(interaction.user.mention)
         user_message = str(interaction.command.name)
@@ -155,7 +135,7 @@ def run_discord_bot():
         await user_response.adduser(interaction, time_reminder, userDatabase)
 
     @bot.tree.command(name = "userinfo")
-    async def time(interaction : discord.Interaction):
+    async def userinfo(interaction : discord.Interaction):
         username = str(interaction.user)
         mention = str(interaction.user.mention)
         user_message = str(interaction.command.name)
@@ -163,18 +143,25 @@ def run_discord_bot():
         print(f'{username} ({mention}) said: "{user_message}" ({channel})')
         await user_response.userinfo(interaction, userDatabase)
 
-    # async def process_command(message : discord.message.Message, client : discord.Client):
-    #     userDatabase = UserDatabase('user_database.db')
-    #     if message.content == '!hello':
-    #         await regular_response.hello(message)
-    #     elif message.content == '!time':
-    #         await regular_response.time(message)
-    #     elif message.content == '!adduser':
-    #         await user_response.adduser(message, client, userDatabase)
-    #     elif message.content == '!userinfo':
-    #         await user_response.userinfo(message, client, userDatabase)
-    #     elif message.content == '!changereminder':
-    #         await user_response.changereminder(message, client, userDatabase)
+    @bot.tree.command(name = "changereminder")
+    @app_commands.describe(time_reminder = "What time do you want to change it to?")
+    async def changereminder(interaction : discord.Interaction, time_reminder : str):
+        username = str(interaction.user)
+        mention = str(interaction.user.mention)
+        user_message = str(interaction.command.name)
+        channel = str(interaction.channel)
+        print(f'{username} ({mention}) said: "{user_message}" ({channel})')
+        await user_response.changereminder(interaction, time_reminder,userDatabase)
+
+    @bot.tree.command(name = "deleteuser")
+    async def changereminder(interaction : discord.Interaction):
+        username = str(interaction.user)
+        mention = str(interaction.user.mention)
+        user_message = str(interaction.command.name)
+        channel = str(interaction.channel)
+        print(f'{username} ({mention}) said: "{user_message}" ({channel})')
+        await user_response.deleteuser(interaction, userDatabase)
+
     #     elif message.content == '!deleteuser':
     #         await user_response.deleteuser(message, client, userDatabase)
     #     elif message.content == '!addtask':
@@ -192,8 +179,6 @@ def run_discord_bot():
     #     else:
     #         await regular_response.invalidInput(message, client)
     #     userDatabase.close()
-
-
 
     bot.run(TOKEN)
     
