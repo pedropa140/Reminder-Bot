@@ -16,7 +16,7 @@ from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
-from flow import InstalledAppFlow2, _WSGIRequestHandler, _RedirectWSGIApp
+from Google_Calendar_Flow import InstalledAppFlow2, _WSGIRequestHandler, _RedirectWSGIApp
 from string import ascii_letters, digits
 import webbrowser
 import wsgiref.simple_server
@@ -80,18 +80,11 @@ async def adduser(interaction : discord.Interaction, time_reminder : str, userDa
                 browser=None
                 
                 await interaction.response.defer()
-                # print(flow.authorization_url())
-                # print(flow.redirect_uri)
-                # creds = flow.run_local_server(port = 0)
-
-                # with open(username_string, "w") as token:
-                #     token.write(creds.to_json())
 
                 wsgi_app = _RedirectWSGIApp(success_message)
-                # Fail fast if the address is occupied
                 wsgiref.simple_server.WSGIServer.allow_reuse_address = False
                 local_server = wsgiref.simple_server.make_server(
-                    bind_addr or host, port, wsgi_app, handler_class=_WSGIRequestHandler
+                    bind_addr or host, port, wsgi_app, handler_class=wsgiref.simple_server.WSGIRequestHandler
                 )
 
                 try:
@@ -102,6 +95,7 @@ async def adduser(interaction : discord.Interaction, time_reminder : str, userDa
                         host, local_server.server_port
                     )
                     auth_url, _ = flow.authorization_url()
+                    print(auth_url)
                     userDatabase.add_user(User(str(interaction.user), str(interaction.user.id), time_reminder))
                     result_title = f'**ALLOW ACCESS**'
                     result_description = f'Please click on this link to allow access to Google Calendars**'
@@ -182,7 +176,6 @@ async def userinfo(interaction : discord.Interaction, userDatabase : UserDatabas
         embed.set_author(name="Reminder-Bot says:")
         embed.set_footer(text="/userinfo")
         await interaction.response.send_message(file=file, embed=embed, ephemeral=False)
-
 
 async def changereminder(interaction : discord.Interaction, time_reminder : str, userDatabase : UserDatabase):
     if not userDatabase.user_exists(str(interaction.user.id)):
