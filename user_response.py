@@ -95,8 +95,7 @@ async def adduser(interaction : discord.Interaction, time_reminder : str, userDa
                         host, local_server.server_port
                     )
                     auth_url, _ = flow.authorization_url()
-                    print(auth_url)
-                    userDatabase.add_user(User(str(interaction.user), str(interaction.user.id), time_reminder))
+                    # print(auth_url)
                     result_title = f'**ALLOW ACCESS**'
                     result_description = f'Please click on this link to allow access to Google Calendars**'
                     embed = discord.Embed(title=result_title, description=result_description, color=0xFF5733)
@@ -107,8 +106,8 @@ async def adduser(interaction : discord.Interaction, time_reminder : str, userDa
                     embed.set_footer(text="/adduser")
                     await interaction.followup.send(file=file, embed=embed, ephemeral=False)
 
-                    if authorization_prompt_message:
-                        print(authorization_prompt_message.format(url=auth_url))
+                    # if authorization_prompt_message:
+                    #     print(authorization_prompt_message.format(url=auth_url))
 
                     local_server.timeout = timeout_seconds
                     local_server.handle_request()
@@ -118,9 +117,8 @@ async def adduser(interaction : discord.Interaction, time_reminder : str, userDa
                     )
                 finally:
                     local_server.server_close()
-                    print("ERROR")
 
-                print(f'credentials: {flow.credentials}')
+                # print(f'credentials: {flow.credentials}')
                 creds = flow.credentials
                 with open(username_string, "w") as token:
                     token.write(creds.to_json())
@@ -144,7 +142,7 @@ async def adduser(interaction : discord.Interaction, time_reminder : str, userDa
             embed.set_thumbnail(url='attachment://icon.png')
             embed.set_author(name="Reminder-Bot says:")
             embed.set_footer(text="/adduser")
-            await interaction.response.send_message(file=file, embed=embed, ephemeral=False)
+            await interaction.followup.send(file=file, embed=embed, ephemeral=False)
         else:
             result_title = f'Invalid Output'
             result_description = f'Did not create user for **{interaction.user.mention}**'
@@ -153,7 +151,7 @@ async def adduser(interaction : discord.Interaction, time_reminder : str, userDa
             embed.set_thumbnail(url='attachment://icon.png')
             embed.set_author(name="Reminder-Bot says:")
             embed.set_footer(text="/adduser")
-            await interaction.response.send_message(file=file, embed=embed, ephemeral=False)
+            await interaction.followup.send(file=file, embed=embed, ephemeral=False)
 
 async def userinfo(interaction : discord.Interaction, userDatabase : UserDatabase):
     if not userDatabase.user_exists(str(interaction.user.id)):
