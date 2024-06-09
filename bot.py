@@ -185,6 +185,15 @@ def run_discord_bot():
         print(f'{username} ({mention}) said: "{user_message} with parameters: {task_name}, {task_start}, {task_end}" ({channel})')
         await task_response.addtask(interaction, task_name, task_start, task_end, userDatabase)
 
+    @bot.tree.command(name = "todaytask", description = "Bot Shows Tasks for Today!")
+    async def todaytask(interaction : discord.Interaction):
+        username = str(interaction.user)
+        mention = str(interaction.user.mention)
+        user_message = str(interaction.command.name)
+        channel = str(interaction.channel)
+        print(f'{username} ({mention}) said: "{user_message}" ({channel})')
+        await task_response.todaytask(interaction, userDatabase)
+
     #     elif message.content == '!todaytask':
     #         await task_response.todaytask(message, client, userDatabase)
     #     elif message.content == '!alltasks':
