@@ -194,17 +194,21 @@ def run_discord_bot():
         print(f'{username} ({mention}) said: "{user_message}" ({channel})')
         await task_response.todaytask(interaction, userDatabase)
 
-    #     elif message.content == '!todaytask':
-    #         await task_response.todaytask(message, client, userDatabase)
-    #     elif message.content == '!alltasks':
-    #         await task_response.alltask(message, client, userDatabase)
+    @bot.tree.command(name = "alltasks", description = "Bot Shows All of the Tasks on the Calendar!")
+    async def alltask(interaction : discord.Interaction):
+        username = str(interaction.user)
+        mention = str(interaction.user.mention)
+        user_message = str(interaction.command.name)
+        channel = str(interaction.channel)
+        print(f'{username} ({mention}) said: "{user_message}" ({channel})')
+        await task_response.alltask(interaction, userDatabase)
+
     #     elif message.content == '!removetask':
     #         await task_response.removetask(message, client, userDatabase)
     #     elif message.content == '!pomodoro':
     #         await regular_response.pomodoro(message, client)
     #     elif message.content == '!help':
     #         await regular_response.help(message, client)
-    #     userDatabase.close()
 
     bot.run(TOKEN)
     
