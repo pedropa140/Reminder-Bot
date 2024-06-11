@@ -222,7 +222,6 @@ async def alltask(interaction : discord.Interaction, userDatabase : UserDatabase
         await interaction.response.send_message(file=file, embed=embed, ephemeral=False)
 
 async def removetask(message : discord.message.Message, client : discord.Client, userDatabase : UserDatabase):
-    return NotImplementedError()
 #     if userDatabase.user_exists(str(interaction.user.id)):
 #         creds = None
 #         username_string = f'token/token_{str(interaction.user.id)}.json'

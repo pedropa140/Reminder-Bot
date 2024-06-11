@@ -203,6 +203,15 @@ def run_discord_bot():
         print(f'{username} ({mention}) said: "{user_message}" ({channel})')
         await task_response.alltask(interaction, userDatabase)
 
+    @bot.tree.command(name = "help", description = "Bot Shows All Commands for Reminder-Bot!")
+    async def help(interaction : discord.Interaction):
+        username = str(interaction.user)
+        mention = str(interaction.user.mention)
+        user_message = str(interaction.command.name)
+        channel = str(interaction.channel)
+        print(f'{username} ({mention}) said: "{user_message}" ({channel})')
+        await task_response.help(interaction)
+
     #     elif message.content == '!removetask':
     #         await task_response.removetask(message, client, userDatabase)
     #     elif message.content == '!pomodoro':

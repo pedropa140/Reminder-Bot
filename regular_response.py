@@ -164,24 +164,24 @@ async def time(interaction : discord.Interaction):
 #             except asyncio.TimeoutError:
 #                 continue
         
-# async def help(message : discord.message.Message, client : discord.Client):
-#     result_string = f'/Help'
-#     help_description = f'''How to use {client.user.mention}'''
-#     embed = discord.Embed(title=result_string, description=help_description, color=0xFF5733)
-#     file = discord.File('images/icon.png', filename='icon.png')
-#     embed.set_thumbnail(url='attachment://icon.png')
-#     embed.set_author(name="Reminder-Bot says:")
-#     embed.add_field(name="/hello", value="returns a friendly greeting/", inline=False)
-#     embed.add_field(name="/time", value="tells the current time.", inline=False)
-#     embed.add_field(name="/adduser", value="adds user to the database", inline=False)
-#     embed.add_field(name="/userinfo", value="returns user information from the database", inline=False)
-#     embed.add_field(name="/changereminder", value="changes the time that the user wants to be notified of the tasks", inline=False)
-#     embed.add_field(name="/deleteuser", value="deletes user from the database", inline=False)
-#     embed.add_field(name="/addtask", value="adds a task to the task list", inline=False)
-#     embed.add_field(name="/todaytask", value="displays the tasks that end on the current date", inline=False)
-#     embed.add_field(name="/alltasks", value="shows all uncompleted tasks", inline=False)
-#     embed.add_field(name="/removetask", value="removes tasks from tasks list", inline=False)
-#     embed.add_field(name="/pomodoro", value="initializes the pomodoro method", inline=False)
-#     embed.add_field(name="/help", value="shows the help menu", inline=False)
-#     embed.set_footer(text="/help")
-#     await message.channel.send(file=file, embed=embed)
+async def help(interaction : discord.Interaction):
+    result_string = f'/Help'
+    help_description = f'''How to use {interaction.user.mention}'''
+    embed = discord.Embed(title=result_string, description=help_description, color=0xFF5733)
+    file = discord.File('images/icon.png', filename='icon.png')
+    embed.set_thumbnail(url='attachment://icon.png')
+    embed.set_author(name="Reminder-Bot says:")
+    embed.add_field(name="/hello", value="returns a friendly greeting/", inline=False)
+    embed.add_field(name="/time", value="tells the current time.", inline=False)
+    embed.add_field(name="/adduser", value="adds user to the database", inline=False)
+    embed.add_field(name="/userinfo", value="returns user information from the database", inline=False)
+    embed.add_field(name="/changereminder", value="changes the time that the user wants to be notified of the tasks", inline=False)
+    embed.add_field(name="/deleteuser", value="deletes user from the database", inline=False)
+    embed.add_field(name="/addtask", value="adds a task to the task list", inline=False)
+    embed.add_field(name="/todaytask", value="displays the tasks that end on the current date", inline=False)
+    embed.add_field(name="/alltasks", value="shows all uncompleted tasks", inline=False)
+    embed.add_field(name="/removetask", value="removes tasks from tasks list", inline=False)
+    embed.add_field(name="/pomodoro", value="initializes the pomodoro method", inline=False)
+    embed.add_field(name="/help", value="shows the help menu", inline=False)
+    embed.set_footer(text="/help")
+    await interaction.response.send_message(file=file, embed=embed)
