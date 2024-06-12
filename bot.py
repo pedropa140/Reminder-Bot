@@ -203,6 +203,16 @@ def run_discord_bot():
         print(f'{username} ({mention}) said: "{user_message}" ({channel})')
         await task_response.alltask(interaction, userDatabase)
 
+    @bot.tree.command(name = "removetask", description = "Bot Removes a Tasks From the Calendar!")    
+    @app_commands.describe(task_name = "What task do you want to delete?")
+    async def removetask(interaction : discord.Interaction, task_name : str):
+        username = str(interaction.user)
+        mention = str(interaction.user.mention)
+        user_message = str(interaction.command.name)
+        channel = str(interaction.channel)
+        print(f'{username} ({mention}) said: "{user_message}" ({channel})')
+        await task_response.removetask(interaction, task_name, userDatabase)
+
     @bot.tree.command(name = "help", description = "Bot Shows All Commands for Reminder-Bot!")
     async def help(interaction : discord.Interaction):
         username = str(interaction.user)

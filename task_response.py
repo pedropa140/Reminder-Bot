@@ -221,41 +221,37 @@ async def alltask(interaction : discord.Interaction, userDatabase : UserDatabase
         embed.set_footer(text="/todaytask")
         await interaction.response.send_message(file=file, embed=embed, ephemeral=False)
 
-async def removetask(message : discord.message.Message, client : discord.Client, userDatabase : UserDatabase):
-#     if userDatabase.user_exists(str(interaction.user.id)):
-#         creds = None
-#         username_string = f'token/token_{str(interaction.user.id)}.json'
-#         if os.path.exists(username_string):
-#             creds = Credentials.from_authorized_user_file(username_string, SCOPES)        
+async def removetask(interaction : discord.Interaction, task_name : str, userDatabase : UserDatabase):
+    if userDatabase.user_exists(str(interaction.user.id)):
+        username_string = f'token/token_{str(interaction.user.id)}.json'
+        if os.path.exists(username_string):
+            creds = Credentials.from_authorized_user_file(username_string, SCOPES)        
 
-#         if not creds or not creds.valid:
-#             if creds and creds.expired and creds.refresh_token:
-#                 try:
-#                     creds.refresh(Request())
-#                 except Exception as e:
-#                     if os.path.exists(username_string):
-#                         os.remove(username_string)
-#             else:
-#                 flow = InstalledAppFlow.from_client_secrets_file("credentials.json", SCOPES)
-#                 creds = flow.run_local_server(port = 0)
+        if not creds or not creds.valid:
+            if creds and creds.expired and creds.refresh_token:
+                try:
+                    creds.refresh(Request())
+                except Exception as e:
+                    if os.path.exists(username_string):
+                        os.remove(username_string)
 
-#                 with open(username_string, "w") as token:
-#                     token.write(creds.to_json())
-#         service = build("calendar", "v3", credentials = creds)
-#         now = datetime.datetime.now().isoformat() + "Z"
-#         event_result = service.events().list(calendarId = "primary", timeMin=now, maxResults = 10, singleEvents = True, orderBy = "startTime").execute()
-#         events = event_result.get("items", [])
-#         if len(events) == 0:
-#             result_title = f'**Error**'
-#             result_description = f'No Tasks On Your Schedule/'
-#             embed = discord.Embed(title=result_title, description=result_description, color=0xFF5733)
-#             file = discord.File('images/icon.png', filename='icon.png')
-#             embed.set_thumbnail(url='attachment://icon.png')
-#             embed.set_author(name="Reminder-Bot says:")
-#             embed.set_footer(text="/removetask")
-#             await message.channel.send(file=file, embed=embed)
-#         else:
-#             sorted_data = sorted(events, key=lambda x: x['end']['dateTime'])
+                with open(username_string, "w") as token:
+                    token.write(creds.to_json())
+        service = build("calendar", "v3", credentials = creds)
+        now = datetime.datetime.now().isoformat() + "Z"
+        event_result = service.events().list(calendarId = "primary", timeMin=now, maxResults = 10, singleEvents = True, orderBy = "startTime").execute()
+        events = event_result.get("items", [])
+        if len(events) == 0:
+            result_title = f'**Error**'
+            result_description = f'No Tasks On Your Schedule/'
+            embed = discord.Embed(title=result_title, description=result_description, color=0xFF5733)
+            file = discord.File('images/icon.png', filename='icon.png')
+            embed.set_thumbnail(url='attachment://icon.png')
+            embed.set_author(name="Reminder-Bot says:")
+            embed.set_footer(text="/removetask")
+            await interaction.response.send_message(file=file, embed=embed, ephemeral=False)
+        else:
+            sorted_data = sorted(events, key=lambda x: x['end']['dateTime'])
 #             result_title = f'**Type the Number Assigned to the Task**'
 #             result_description = f'**Please Enter the Number Assigned Next to the Task.**'
 #             embed = discord.Embed(title=result_title, description=result_description, color=0xFF5733)
@@ -269,7 +265,7 @@ async def removetask(message : discord.message.Message, client : discord.Client,
 #                 embed.add_field(name=str(counter) + "\t" + item['summary'].replace('"', ''), value=string, inline=False)
 #                 counter += 1
 #             embed.set_footer(text="/removetask")
-#             await message.channel.send(file=file, embed=embed)
+#             await interaction.response.send_message(file=file, embed=embed, ephemeral=False)
 #             def check(m):
 #                 return m.author == message.author and m.channel == message.channel
 #             try:
@@ -282,34 +278,34 @@ async def removetask(message : discord.message.Message, client : discord.Client,
 #                 embed.set_thumbnail(url='attachment://icon.png')
 #                 embed.set_author(name="Reminder-Bot says:")
 #                 embed.set_footer(text="/removetask")
-#                 await message.channel.send(file=file, embed=embed)
+#                 await interaction.response.send_message(file=file, embed=embed, ephemeral=False)
 #                 return
-#             if 0 < int(removetask_action_content) < len(sorted_data) + 1 and removetask_action_content.isdigit():
-#                 service.events().delete(calendarId='primary', eventId=sorted_data[int(removetask_action_content) - 1]['id']).execute()
-#                 result_title = f'**Task Deleted**'
-#                 result_description = f'**{sorted_data[int(removetask_action_content) - 1]['summary']}** has been deleted/'
-#                 embed = discord.Embed(title=result_title, description=result_description, color=0xFF5733)
-#                 file = discord.File('images/icon.png', filename='icon.png')
-#                 embed.set_thumbnail(url='attachment://icon.png')
-#                 embed.set_author(name="Reminder-Bot says:")
-#                 embed.set_footer(text="/removetask")
-#                 await message.channel.send(file=file, embed=embed)
-#             else:
-#                 result_title = f'**Error**'
-#                 result_description = f'Invalid Input. Please try again.'
-#                 embed = discord.Embed(title=result_title, description=result_description, color=0xFF5733)
-#                 file = discord.File('images/icon.png', filename='icon.png')
-#                 embed.set_thumbnail(url='attachment://icon.png')
-#                 embed.set_author(name="Reminder-Bot says:")
-#                 embed.set_footer(text="/removetask")
-#                 await message.channel.send(file=file, embed=embed)
-#     else:
-#         result_title = f'Account Not Found'
-#         result_description = f'User not found for for **{interaction.user.mention}**'
-#         embed = discord.Embed(title=result_title, description=result_description, color=0xFF5733)
-#         file = discord.File('images/icon.png', filename='icon.png')
-#         embed.set_thumbnail(url='attachment://icon.png')
-#         embed.set_author(name="Reminder-Bot says:")
-#         embed.set_footer(text="/removetask")
-#         await message.channel.send(file=file, embed=embed)
+            if 0 < int(removetask_action_content) < len(sorted_data) + 1 and removetask_action_content.isdigit():
+                service.events().delete(calendarId='primary', eventId=sorted_data[int(removetask_action_content) - 1]['id']).execute()
+                result_title = f'**Task Deleted**'
+                result_description = f'**{sorted_data[int(removetask_action_content) - 1]['summary']}** has been deleted/'
+                embed = discord.Embed(title=result_title, description=result_description, color=0xFF5733)
+                file = discord.File('images/icon.png', filename='icon.png')
+                embed.set_thumbnail(url='attachment://icon.png')
+                embed.set_author(name="Reminder-Bot says:")
+                embed.set_footer(text="/removetask")
+                await interaction.response.send_message(file=file, embed=embed, ephemeral=False)
+            else:
+                result_title = f'**Error**'
+                result_description = f'Invalid Input. Please try again.'
+                embed = discord.Embed(title=result_title, description=result_description, color=0xFF5733)
+                file = discord.File('images/icon.png', filename='icon.png')
+                embed.set_thumbnail(url='attachment://icon.png')
+                embed.set_author(name="Reminder-Bot says:")
+                embed.set_footer(text="/removetask")
+                await interaction.response.send_message(file=file, embed=embed, ephemeral=False)
+    else:
+        result_title = f'Account Not Found'
+        result_description = f'User not found for for **{interaction.user.mention}**'
+        embed = discord.Embed(title=result_title, description=result_description, color=0xFF5733)
+        file = discord.File('images/icon.png', filename='icon.png')
+        embed.set_thumbnail(url='attachment://icon.png')
+        embed.set_author(name="Reminder-Bot says:")
+        embed.set_footer(text="/removetask")
+        await interaction.response.send_message(file=file, embed=embed, ephemeral=False)
 
