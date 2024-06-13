@@ -252,34 +252,6 @@ async def removetask(interaction : discord.Interaction, task_name : str, userDat
             await interaction.response.send_message(file=file, embed=embed, ephemeral=False)
         else:
             sorted_data = sorted(events, key=lambda x: x['end']['dateTime'])
-#             result_title = f'**Type the Number Assigned to the Task**'
-#             result_description = f'**Please Enter the Number Assigned Next to the Task.**'
-#             embed = discord.Embed(title=result_title, description=result_description, color=0xFF5733)
-#             file = discord.File('images/icon.png', filename='icon.png')
-#             embed.set_thumbnail(url='attachment://icon.png')
-#             embed.set_author(name="Reminder-Bot says:")
-#             counter = 1
-#             for item in sorted_data:
-#                 # string = f'{i[2]} to {i[3]}'
-#                 string = f'**Start Time: ** {datetime.datetime.strptime(item['start']['dateTime'][:19], "%Y-%m-%dT%H:%M:%S").strftime("%B %d, %Y %I:%M:%S %p")}\n**End Time: **{datetime.datetime.strptime(item['end']['dateTime'][:19], "%Y-%m-%dT%H:%M:%S").strftime("%B %d, %Y %I:%M:%S %p")}\n**Link: **{item['htmlLink']}'
-#                 embed.add_field(name=str(counter) + "\t" + item['summary'].replace('"', ''), value=string, inline=False)
-#                 counter += 1
-#             embed.set_footer(text="/removetask")
-#             await interaction.response.send_message(file=file, embed=embed, ephemeral=False)
-#             def check(m):
-#                 return m.author == message.author and m.channel == message.channel
-#             try:
-#                 removedtask_action = await client.wait_for('message', check=check, timeout=30)
-#                 removetask_action_content = removedtask_action.content 
-#             except asyncio.TimeoutError:
-#                 string = f'{interaction.user.mention} has taken too long to respond.'
-#                 embed = discord.Embed(title= "Timeout Error", description=string, color=0xFF5733)
-#                 file = discord.File('images/icon.png', filename='icon.png')
-#                 embed.set_thumbnail(url='attachment://icon.png')
-#                 embed.set_author(name="Reminder-Bot says:")
-#                 embed.set_footer(text="/removetask")
-#                 await interaction.response.send_message(file=file, embed=embed, ephemeral=False)
-#                 return
             if 0 < int(removetask_action_content) < len(sorted_data) + 1 and removetask_action_content.isdigit():
                 service.events().delete(calendarId='primary', eventId=sorted_data[int(removetask_action_content) - 1]['id']).execute()
                 result_title = f'**Task Deleted**'
