@@ -252,10 +252,27 @@ async def removetask(interaction : discord.Interaction, task_name : str, userDat
             await interaction.response.send_message(file=file, embed=embed, ephemeral=False)
         else:
             sorted_data = sorted(events, key=lambda x: x['end']['dateTime'])
-            if 0 < int(removetask_action_content) < len(sorted_data) + 1 and removetask_action_content.isdigit():
-                service.events().delete(calendarId='primary', eventId=sorted_data[int(removetask_action_content) - 1]['id']).execute()
+            # if 0 < int(removetask_action_content) < len(sorted_data) + 1 and removetask_action_content.isdigit():
+            #     service.events().delete(calendarId='primary', eventId=sorted_data[int(removetask_action_content) - 1]['id']).execute()
+            #     result_title = f'**Task Deleted**'
+            #     result_description = f'**{sorted_data[int(removetask_action_content) - 1]['summary']}** has been deleted/'
+            #     embed = discord.Embed(title=result_title, description=result_description, color=0xFF5733)
+            #     file = discord.File('images/icon.png', filename='icon.png')
+            #     embed.set_thumbnail(url='attachment://icon.png')
+            #     embed.set_author(name="Reminder-Bot says:")
+            #     embed.set_footer(text="/removetask")
+            #     await interaction.response.send_message(file=file, embed=embed, ephemeral=False)
+            check = False
+            counter = 0
+            for event in sorted_data:
+                if task_name == event['summary']:
+                    check = True
+                    break
+                counter += 1
+            if check:
+                service.events().delete(calendarId='primary', eventId=sorted_data[counter]['id']).execute()
                 result_title = f'**Task Deleted**'
-                result_description = f'**{sorted_data[int(removetask_action_content) - 1]['summary']}** has been deleted/'
+                result_description = f'**{sorted_data[counter]['id']}** has been deleted/'
                 embed = discord.Embed(title=result_title, description=result_description, color=0xFF5733)
                 file = discord.File('images/icon.png', filename='icon.png')
                 embed.set_thumbnail(url='attachment://icon.png')

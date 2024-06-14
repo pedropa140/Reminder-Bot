@@ -213,6 +213,16 @@ def run_discord_bot():
         print(f'{username} ({mention}) said: "{user_message}" ({channel})')
         await task_response.removetask(interaction, task_name, userDatabase)
 
+    @bot.tree.command(name = "pomodoro", description = "Starts a Pomodoro Clock!")
+    @app_commands.describe(task_name = "Enter Task Name", task_start = f"Enter Task Start Time in **YEAR-MONTH-DATETHOUR:MINUTE:SECONDS**", task_end = f"Enter Task End Time in **YEAR-MONTH-DATETHOUR:MINUTE:SECONDS**")
+    async def pomodoro(interaction : discord.Interaction, task_name : str, task_start : str, task_end : str):
+        username = str(interaction.user)
+        mention = str(interaction.user.mention)
+        user_message = str(interaction.command.name)
+        channel = str(interaction.channel)
+        print(f'{username} ({mention}) said: "{user_message} with parameters: {task_name}, {task_start}, {task_end}" ({channel})')
+        await regular_response.pomodoro(interaction, task_name, task_start, task_end, userDatabase)
+
     @bot.tree.command(name = "help", description = "Bot Shows All Commands for Reminder-Bot!")
     async def help(interaction : discord.Interaction):
         username = str(interaction.user)
@@ -221,13 +231,6 @@ def run_discord_bot():
         channel = str(interaction.channel)
         print(f'{username} ({mention}) said: "{user_message}" ({channel})')
         await task_response.help(interaction)
-
-    #     elif message.content == '!removetask':
-    #         await task_response.removetask(message, client, userDatabase)
-    #     elif message.content == '!pomodoro':
-    #         await regular_response.pomodoro(message, client)
-    #     elif message.content == '!help':
-    #         await regular_response.help(message, client)
 
     bot.run(TOKEN)
     
