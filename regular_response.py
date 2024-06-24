@@ -45,7 +45,7 @@ async def time(interaction : discord.Interaction):
     embed.set_footer(text="/time")
     await interaction.response.send_message(file=file, embed=embed, ephemeral=False)
 
-# async def pomodoro(message : discord.message.Message, client: discord.Client):
+async def pomodoro(message : discord.message.Message, client: discord.Client):
 #     result_string = f'Enter Study Time'
 #     help_description = f'''Enter the minutes of how long you want to study for?'''
 #     embed = discord.Embed(title=result_string, description=help_description, color=0xFF5733)

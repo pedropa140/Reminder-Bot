@@ -97,29 +97,29 @@ In a terminal, find the directory where main.py is located and run this command:
   ```
 
 ### Options:
-  - **@Reminder-Bot !hello**
+  - **/hello**
     - returns a friendly greeting! 
-  - **@Reminder-Bot !time**
+  - **/time**
     - tells the current time.
-  - **@Reminder-Bot !adduser**
+  - **/adduser**
     - adds user to the database.
-  - **@Reminder-Bot !userinfo**
+  - **/userinfo**
     - returns user information from the database.
-  - **@Reminder-Bot !changereminder**
+  - **/changereminder**
     - changes the time that the user wants to be notified of the tasks.
-  - **@Reminder-Bot !deleteuser**
+  - **/deleteuser**
     - deletes user from the database.
-  - **@Reminder-Bot !addtask**
+  - **/addtask**
     - adds a task to the task list.
-  - **@Reminder-Bot !todaytask**
+  - **/todaytask**
     - displays the tasks that end on the current date.
-  - **@Reminder-Bot !alltasks**
+  - **/alltasks**
     - shows all uncompleted tasks.
-  - **@Reminder-Bot !removetask**
+  - **/removetask**
     - removes tasks from tasks list.
-  - **@Reminder-Bot !completetask**
+  - **/completetask**
     - updates an uncompleted task into completed.
-  - **@Reminder-Bot !pomodoro**
+  - **/pomodoro**
     - initializes the pomodoro method.
-  - **@Reminder-Bot !help**
+  - **/help**
     - shows the help menu.

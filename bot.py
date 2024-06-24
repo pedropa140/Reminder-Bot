@@ -214,14 +214,14 @@ def run_discord_bot():
         await task_response.removetask(interaction, task_name, userDatabase)
 
     @bot.tree.command(name = "pomodoro", description = "Starts a Pomodoro Clock!")
-    @app_commands.describe(task_name = "Enter Task Name", task_start = f"Enter Task Start Time in **YEAR-MONTH-DATETHOUR:MINUTE:SECONDS**", task_end = f"Enter Task End Time in **YEAR-MONTH-DATETHOUR:MINUTE:SECONDS**")
-    async def pomodoro(interaction : discord.Interaction, task_name : str, task_start : str, task_end : str):
+    @app_commands.describe(pomodoro_start = "Enter Work Minutes", pomodoro_break = "Enter Break Minutes", intervals = "Enter How Many Times You Want to Run")
+    async def pomodoro(interaction : discord.Interaction, pomodoro_start : str, pomodoro_break : str, intervals : str):
         username = str(interaction.user)
         mention = str(interaction.user.mention)
         user_message = str(interaction.command.name)
         channel = str(interaction.channel)
-        print(f'{username} ({mention}) said: "{user_message} with parameters: {task_name}, {task_start}, {task_end}" ({channel})')
-        await regular_response.pomodoro(interaction, task_name, task_start, task_end, userDatabase)
+        print(f'{username} ({mention}) said: "{user_message} with parameters: {pomodoro_start}, {pomodoro_break}, {intervals}" ({channel})')
+        await regular_response.pomodoro(interaction, pomodoro_start, pomodoro_break, intervals, userDatabase)
 
     @bot.tree.command(name = "help", description = "Bot Shows All Commands for Reminder-Bot!")
     async def help(interaction : discord.Interaction):
