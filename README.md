@@ -101,25 +101,23 @@ In a terminal, find the directory where main.py is located and run this command:
     - returns a friendly greeting! 
   - **/time**
     - tells the current time.
-  - **/adduser**
+  - **/adduser [REMINDER-TIME]**
     - adds user to the database.
   - **/userinfo**
     - returns user information from the database.
-  - **/changereminder**
+  - **/changereminder [REMINDER-TIME]**
     - changes the time that the user wants to be notified of the tasks.
   - **/deleteuser**
     - deletes user from the database.
-  - **/addtask**
+  - **/addtask [TASK-NAME] [TASK-START-TIME] [TASK-END-TIME]**
     - adds a task to the task list.
   - **/todaytask**
     - displays the tasks that end on the current date.
   - **/alltasks**
     - shows all uncompleted tasks.
-  - **/removetask**
+  - **/removetask [TASK-NAME]**
     - removes tasks from tasks list.
-  - **/completetask**
-    - updates an uncompleted task into completed.
-  - **/pomodoro**
+  - **/pomodoro [WORK-TIME] [BREAK-TIME] [REPEATS]**
     - initializes the pomodoro method.
   - **/help**
     - shows the help menu.
