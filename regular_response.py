@@ -45,7 +45,7 @@ async def time(interaction : discord.Interaction):
     embed.set_footer(text="/time")
     await interaction.response.send_message(file=file, embed=embed, ephemeral=False)
 
-async def pomodoro(message : discord.message.Message, client: discord.Client):
+async def pomodoro(interaction : discord.Interaction, pomodoro_start : str, pomodoro_break : str, intervals : str, userDatabase : UserDatabase):
 #     result_string = f'Enter Study Time'
 #     help_description = f'''Enter the minutes of how long you want to study for?'''
 #     embed = discord.Embed(title=result_string, description=help_description, color=0xFF5733)
@@ -88,16 +88,16 @@ async def pomodoro(message : discord.message.Message, client: discord.Client):
 #         return m.author == message.author and m.channel == message.channel
 #     break_time = await client.wait_for('message', check=check, timeout=30)
 #     try:
-#         if not break_time.content.isdigit():
-#             result_title = f'Invalid Output'
-#             result_description = f'Pomodoro did not start for **{message.author.mention}**'
-#             embed = discord.Embed(title=result_title, description=result_description, color=0xFF5733)
-#             file = discord.File('images/icon.png', filename='icon.png')
-#             embed.set_thumbnail(url='attachment://icon.png')
-#             embed.set_author(name="Reminder-Bot says:")
-#             embed.set_footer(text="/pomodoro")
-#             await message.channel.send(file=file, embed=embed)
-#             return        
+    if not pomodoro_break.content.isdigit():
+        result_title = f'Invalid Output'
+        result_description = f'Pomodoro did not start for **{interaction.user.mention}**'
+        embed = discord.Embed(title=result_title, description=result_description, color=0xFF5733)
+        file = discord.File('images/icon.png', filename='icon.png')
+        embed.set_thumbnail(url='attachment://icon.png')
+        embed.set_author(name="Reminder-Bot says:")
+        embed.set_footer(text="/pomodoro")
+        await interaction.response.send_message(file=file, embed=embed, ephemeral=False)
+        return        
 #     except asyncio.TimeoutError:
 #         string = f'{message.author.mention} has taken too long to respond.'
 #         embed = discord.Embed(title= "Timeout Error", description=string, color=0xFF5733)
