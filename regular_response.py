@@ -46,49 +46,7 @@ async def time(interaction : discord.Interaction):
     await interaction.response.send_message(file=file, embed=embed, ephemeral=False)
 
 async def pomodoro(interaction : discord.Interaction, pomodoro_start : str, pomodoro_break : str, intervals : str, userDatabase : UserDatabase):
-#     result_string = f'Enter Study Time'
-#     help_description = f'''Enter the minutes of how long you want to study for?'''
-#     embed = discord.Embed(title=result_string, description=help_description, color=0xFF5733)
-#     file = discord.File('images/icon.png', filename='icon.png')
-#     embed.set_thumbnail(url='attachment://icon.png')
-#     embed.set_author(name="Reminder-Bot says:")
-#     embed.set_footer(text="/pomodoro")
-#     await message.channel.send(file=file, embed=embed)
-#     def check(m):
-#         return m.author == message.author and m.channel == message.channel
-#     study_time = await client.wait_for('message', check=check, timeout=30)
-#     try:
-#         if not study_time.content.isdigit():
-#             result_title = f'Invalid Output'
-#             result_description = f'Pomodoro did not start for **{message.author.mention}**'
-#             embed = discord.Embed(title=result_title, description=result_description, color=0xFF5733)
-#             file = discord.File('images/icon.png', filename='icon.png')
-#             embed.set_thumbnail(url='attachment://icon.png')
-#             embed.set_author(name="Reminder-Bot says:")
-#             embed.set_footer(text="/pomodoro")
-#             await message.channel.send(file=file, embed=embed)
-#             return        
-#     except asyncio.TimeoutError:
-#         string = f'{message.author.mention} has taken too long to respond.'
-#         embed = discord.Embed(title= "Timeout Error", description=string, color=0xFF5733)
-#         file = discord.File('images/icon.png', filename='icon.png')
-#         embed.set_thumbnail(url='attachment://icon.png')
-#         embed.set_author(name="Reminder-Bot says:")
-#         embed.set_footer(text="/adduser")
-#         await message.channel.send(file=file, embed=embed)
-#     result_string = f'Enter Break Time'
-#     help_description = f'''Enter the minutes of how long you want to break to be for?'''
-#     embed = discord.Embed(title=result_string, description=help_description, color=0xFF5733)
-#     file = discord.File('images/icon.png', filename='icon.png')
-#     embed.set_thumbnail(url='attachment://icon.png')
-#     embed.set_author(name="Reminder-Bot says:")
-#     embed.set_footer(text="/pomodoro")
-#     await message.channel.send(file=file, embed=embed)
-#     def check(m):
-#         return m.author == message.author and m.channel == message.channel
-#     break_time = await client.wait_for('message', check=check, timeout=30)
-#     try:
-    if not pomodoro_break.content.isdigit():
+    if not pomodoro_break.isdigit() or not pomodoro_start.isdigit() or not intervals.isdigit():
         result_title = f'Invalid Output'
         result_description = f'Pomodoro did not start for **{interaction.user.mention}**'
         embed = discord.Embed(title=result_title, description=result_description, color=0xFF5733)
@@ -97,72 +55,35 @@ async def pomodoro(interaction : discord.Interaction, pomodoro_start : str, pomo
         embed.set_author(name="Reminder-Bot says:")
         embed.set_footer(text="/pomodoro")
         await interaction.response.send_message(file=file, embed=embed, ephemeral=False)
-        return        
-#     except asyncio.TimeoutError:
-#         string = f'{message.author.mention} has taken too long to respond.'
-#         embed = discord.Embed(title= "Timeout Error", description=string, color=0xFF5733)
-#         file = discord.File('images/icon.png', filename='icon.png')
-#         embed.set_thumbnail(url='attachment://icon.png')
-#         embed.set_author(name="Reminder-Bot says:")
-#         embed.set_footer(text="/adduser")
-#         await message.channel.send(file=file, embed=embed)    
-#     study_time_content = int(study_time.content)
-#     break_time_content = int(break_time.content)
-#     study_seconds = study_time_content * 60
-#     break_seconds = break_time_content * 60
-#     pomodoro_running = True
-#     while pomodoro_running:
-#         result_title = f'Study Time Started'
-#         result_description = f'Pomodoro started for **{message.author.mention}**\nStart working for {study_time_content} minutes'
-#         embed = discord.Embed(title=result_title, description=result_description, color=0xFF5733)
-#         file = discord.File('images/icon.png', filename='icon.png')
-#         embed.set_thumbnail(url='attachment://icon.png')
-#         embed.set_author(name="Reminder-Bot says:")
-#         embed.set_footer(text="/pomodoro")
-#         await message.channel.send(file=file, embed=embed)
-#         for i in range(study_seconds):
-#             try:
-#                 end = await client.wait_for('message', check=check, timeout=1)
-#                 if end.content == '/terminate':
-#                     pomodoro_running = False
-#                     print(False)
-#                     result_title = f'Pomodoro Terminated'
-#                     result_description = f'Pomodoro terminated for **{message.author.mention}**'
-#                     embed = discord.Embed(title=result_title, description=result_description, color=0xFF5733)
-#                     file = discord.File('images/icon.png', filename='icon.png')
-#                     embed.set_thumbnail(url='attachment://icon.png')
-#                     embed.set_author(name="Reminder-Bot says:")
-#                     embed.set_footer(text="/pomodoro")
-#                     await message.channel.send(file=file, embed=embed) 
-#                     return
-#             except asyncio.TimeoutError:
-#                 continue
+        return
+    
+    counter = 0
+    study_time = int(pomodoro_start)
+    study_seconds = study_time * 60
+    break_seconds  = int(pomodoro_break)
+    break_seconds = break_seconds * 60
+    while counter < intervals:
+        result_title = f'Study Time Started'
+        result_description = f'Pomodoro started for **{message.author.mention}**\nStart working for {study_time_content} minutes'
+        embed = discord.Embed(title=result_title, description=result_description, color=0xFF5733)
+        file = discord.File('images/icon.png', filename='icon.png')
+        embed.set_thumbnail(url='attachment://icon.png')
+        embed.set_author(name="Reminder-Bot says:")
+        embed.set_footer(text="/pomodoro")
+        await interaction.response.send_message(file=file, embed=embed, ephemeral=False)
+        asyncio.sleep(pomodoro_start)
 
-#         result_title = f'Break Time Started'
-#         result_description = f'Pomodoro started for **{message.author.mention}**\nStart chilling for {break_time_content} minutes'
-#         embed = discord.Embed(title=result_title, description=result_description, color=0xFF5733)
-#         file = discord.File('images/icon.png', filename='icon.png')
-#         embed.set_thumbnail(url='attachment://icon.png')
-#         embed.set_author(name="Reminder-Bot says:")
-#         embed.set_footer(text="/pomodoro")
-#         await message.channel.send(file=file, embed=embed)
-#         for i in range(break_seconds):
-#             try:
-#                 end = await client.wait_for('message', check=check, timeout=1)
-#                 if end.content == '/terminate':
-#                     print(False)
-#                     pomodoro_running = False
-#                     result_title = f'Pomodoro Terminated'
-#                     result_description = f'Pomodoro terminated for **{message.author.mention}**'
-#                     embed = discord.Embed(title=result_title, description=result_description, color=0xFF5733)
-#                     file = discord.File('images/icon.png', filename='icon.png')
-#                     embed.set_thumbnail(url='attachment://icon.png')
-#                     embed.set_author(name="Reminder-Bot says:")
-#                     embed.set_footer(text="/pomodoro")
-#                     await message.channel.send(file=file, embed=embed) 
-#                     return
-#             except asyncio.TimeoutError:
-#                 continue
+        result_title = f'Break Time Started'
+        result_description = f'Pomodoro started for **{message.author.mention}**\nStart chilling for {break_time_content} minutes'
+        embed = discord.Embed(title=result_title, description=result_description, color=0xFF5733)
+        file = discord.File('images/icon.png', filename='icon.png')
+        embed.set_thumbnail(url='attachment://icon.png')
+        embed.set_author(name="Reminder-Bot says:")
+        embed.set_footer(text="/pomodoro")
+        await interaction.response.send_message(file=file, embed=embed, ephemeral=False)
+        asyncio.sleep(pomodoro_break)
+
+        counter += 1
         
 async def help(interaction : discord.Interaction):
     result_string = f'/Help'
